@@ -725,6 +725,8 @@ try:
     Button(text='修改标题', command=tit)
     Button(text='通过网页显示', command=serv).pack(side=RIGHT)
     Button(text='类型检查', command=mypy_type).pack(side=RIGHT)
+    Button(text='百度',command=lambda: MyThread(baidu)).pack(side=RIGHT)
+    Button(text='python官网',command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
     Button(text='python版本', command=lambda: MyThread(
         python_version)).pack(side=LEFT)
     mainloop()
