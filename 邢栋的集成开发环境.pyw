@@ -112,17 +112,17 @@ try:
         removedir("__pycache__")
 
     def pip_install():
-        system("pip install " + message.get() + " --no-cache-dir & pause")
         top.title("用pip安装" + message.get())
+        system("pip install " + message.get() + " --no-cache-dir & pause")
 
     def pip_upgrade():
+        top.title("用pip更新" + message.get())
         system("pip install --upgrade " +
                message.get() + " --no-cache-dir & pause")
-        top.title("用pip更新" + message.get())
 
     def pip_uninstall():
-        system("pip uninstall " + message.get() + " --no-cache-dir & pause")
         top.title("用pip卸载" + message.get())
+        system("pip uninstall " + message.get() + " --no-cache-dir & pause")
 
     def pip_install_uninstall():
         system("pip uninstall " + message.get() + " -y & pip install " +
@@ -552,6 +552,7 @@ try:
     def baidu():
         from webbrowser import open
         open("https://www.baidu.com/")
+
     def pyenv_list():
         system("pyenv install -l")
     bifs = dir(__builtins__)
@@ -704,7 +705,7 @@ try:
     menu14.add_command(label='diff', command=git_diff)
     menubar.add_cascade(label='git', menu=menu14)
     top.config(menu=menubar)
-    menu15 = Menu(menubar,tearoff=False)
+    menu15 = Menu(menubar, tearoff=False)
     menu15.add_command(label='安装', command=lambda: MyThread(pyenv_install))
     menu15.add_command(label='卸载', command=lambda: MyThread(pyenv_uninstall))
     menu15.add_command(label='更新', command=lambda: MyThread(pyenv_update))
@@ -725,8 +726,8 @@ try:
     Button(text='修改标题', command=tit)
     Button(text='通过网页显示', command=serv).pack(side=RIGHT)
     Button(text='类型检查', command=mypy_type).pack(side=RIGHT)
-    Button(text='百度',command=lambda: MyThread(baidu)).pack(side=RIGHT)
-    Button(text='python官网',command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
+    Button(text='百度', command=lambda: MyThread(baidu)).pack(side=RIGHT)
+    Button(text='python官网', command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
     Button(text='python版本', command=lambda: MyThread(
         python_version)).pack(side=LEFT)
     mainloop()
