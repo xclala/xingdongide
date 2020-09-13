@@ -6,6 +6,7 @@ try:
     import string
     from keyword import kwlist
     from threading import Thread
+    from win32com.shell import shell,shellcon
 
     def load():
         from win32ui import CreateFileDialog
@@ -268,7 +269,7 @@ try:
 
     def remv():
         top.title("删除" + message.get())
-        system("move " + message.get() + " 删除的文件/" + message.get())
+        shell.SHFileOperation((0,shellcon.FO_DELETE,message.get(),None,shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO | shellcon.FOF_NOCONFIRMATION,None,None))
 
     def import_colors():
         system("python colors.pyw")
@@ -333,7 +334,7 @@ try:
         system("attrib -H " + message.get())
 
     def serv():
-        system("echo 此功能会让同一局域网内的所有用户通过浏览器输入您的ip地址来下载在本目录的文件或打开本目录下的index.html的页面，您可能需要设置防火墙。 & server 80")
+        system("echo 此功能会让同一局域网内的所有用户通过浏览器输入您的ip地址来下载在本目录的文件或打开本目录下的index.html的页面，您可能需要设置防火墙。 & server")
 
     def speed():
         system("py -m cProfile " + message.get() + "& pause")
