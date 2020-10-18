@@ -117,7 +117,7 @@ try:
         system("pip install " + message.get() + " --no-cache-dir & pause")
 
     def pip_upgrade():
-        top.title("用pip更新" + message.get())
+        top.title("用pip升级" + message.get())
         system("pip install --upgrade " +
                message.get() + " --no-cache-dir & pause")
 
@@ -617,7 +617,7 @@ try:
     menu2.add_command(label='卸载', command=pip_uninstall)
     menu2.add_command(
         label='重新安装', command=lambda: MyThread(pip_install_uninstall))
-    menu2.add_command(label='更新', command=lambda: MyThread(pip_upgrade))
+    menu2.add_command(label='升级', command=lambda: MyThread(pip_upgrade))
     menu2.add_command(label='安装', command=lambda: MyThread(pip_install))
     menubar.add_cascade(label="python第三方包软件商店", menu=menu2)
     top.config(menu=menubar)
