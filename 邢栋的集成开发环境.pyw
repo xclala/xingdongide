@@ -552,7 +552,7 @@ try:
 
     def baidu():
         from webbrowser import open
-        open("https://www.baidu.com/")
+        open(f"https://www.baidu.com/s?wd={message.get()}&ie=utf-8")
 
     def pyenv_list():
         system("pyenv install -l")
