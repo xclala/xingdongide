@@ -8,12 +8,7 @@
 
 <body>
     <style>
-        body {
-            background-color: #d0e4fe;
-        }
-
         h1 {
-            color: orangered;
             text-align: center;
         }
 
@@ -23,6 +18,20 @@
     </style>
     <h1>依赖</h1>
     <strong>本程序只能在windows的python3中正常运行。其他依赖有ipython,setuptools,pip,pyinstaller,requests,coverage,pycodestyle,ipdb,yapf,wxpython,pylint,pyenv,win32com可以通过pip安装。还有无法通过pip安装的依赖有gcc,JDK,golang,git</strong>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var bg = ['black', 'white']
+            var strong = ['white', 'black']
+            var c = 0
+            $("h1").click(function () {
+                $("body").css("background", bg[c % 2])
+                $("strong").css("color", strong[c % 2])
+                $("h1").css("color", strong[c % 2])
+                c++
+            })
+        })
+    </script>
 </body>
 
 </html>
