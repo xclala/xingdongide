@@ -6,7 +6,7 @@ try:
     import string
     from keyword import kwlist
     from threading import Thread
-    from win32com.shell import shell,shellcon
+    from win32com.shell import shell, shellcon
 
     def load():
         from win32ui import CreateFileDialog
@@ -269,7 +269,8 @@ try:
 
     def remv():
         top.title("删除" + message.get())
-        shell.SHFileOperation((0,shellcon.FO_DELETE,message.get(),None,shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO | shellcon.FOF_NOCONFIRMATION,None,None))
+        shell.SHFileOperation((0, shellcon.FO_DELETE, message.get(
+        ), None, shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO | shellcon.FOF_NOCONFIRMATION, None, None))
 
     def import_colors():
         system("python colors.pyw")
@@ -334,7 +335,7 @@ try:
         system("attrib -H " + message.get())
 
     def serv():
-        system("echo 此功能会让同一局域网内的所有用户通过浏览器输入您的ip地址来下载在本目录的文件或打开本目录下的index.html的页面，您可能需要设置防火墙。 & server")
+        system("server")
 
     def speed():
         system("py -m cProfile " + message.get() + "& pause")
@@ -718,15 +719,16 @@ try:
     Button(text='计算器', command=lambda: MyThread(calc)).pack(side=RIGHT)
     Button(text='添加到任务栏', command=labl).pack(side=RIGHT)
     Button(text='死亡之ping', command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
-    Button(text='有道翻译器', command=import_fanyi).pack(side=RIGHT)
-    Button(text='创建虚拟环境', command=vtenv).pack(side=RIGHT)
+    Button(text='有道翻译器', command=lambda: MyThread(
+        import_fanyi)).pack(side=RIGHT)
+    Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
     Button(text='用setuptools打包(需先填写setup.py)',
-           command=pythonsetuptools).pack(side=RIGHT)
+           command=lambda: MyThread(pythonsetuptools)).pack(side=RIGHT)
     Button(text='颜色表', command=lambda: MyThread(
         import_colors)).pack(side=RIGHT)
     Button(text='修改标题', command=tit)
-    Button(text='通过网页显示', command=serv).pack(side=RIGHT)
-    Button(text='类型检查', command=mypy_type).pack(side=RIGHT)
+    Button(text='启动80端口服务器', command=serv).pack(side=RIGHT)
+    Button(text='类型检查', command=lambda: MyThread(mypy_type)).pack(side=RIGHT)
     Button(text='百度', command=lambda: MyThread(baidu)).pack(side=RIGHT)
     Button(text='python官网', command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
     Button(text='python版本', command=lambda: MyThread(
