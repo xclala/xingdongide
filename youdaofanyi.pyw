@@ -25,5 +25,5 @@ try:
     string.pack(side=LEFT, expand=True, fill=X)
     Button(text='转换', command=fanyi).pack(side=RIGHT)
     mainloop()
-except:
-    pass
+except Exception as e:
+    print(e)
