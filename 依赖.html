@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>依赖</title>
+    <meta name="author" content="邢栋">
+</head>
+
+<body>
+    <style>
+        @media(prefers-color-scheme:dark) {
+
+            h1,
+            strong {
+                color: white;
+            }
+
+            body {
+                background-color: #111114;
+            }
+        }
+
+        @media(prefers-color-scheme:light) {
+
+            h1,
+            strong {
+                color: black;
+            }
+
+            body {
+                background-color: whitesmoke;
+            }
+
+        }
+
+        h1 {
+            text-align: center;
+        }
+    </style>
+    <h1>依赖</h1>
+    <strong>本程序只能在windows的python3中正常运行。其他依赖有ipython,setuptools,pip,pyinstaller,requests,coverage,pycodestyle,ipdb,yapf,wxpython,pylint,pyenv,win32com可以通过pip安装。还有无法通过pip安装的依赖有gcc,JDK,golang,git</strong>
+    <script>
+        window.onload = function () {
+            const BACKGROUNDCOLOR = ['black', 'white']
+            const TEXTCOLOR = ['white', 'black']
+            let c = 0
+            document.getElementsByTagName("h1")[0].onclick = function () {
+                document.body.style.backgroundColor = BACKGROUNDCOLOR[c % 2]
+                document.getElementsByTagName("strong")[0].style.color = TEXTCOLOR[c % 2]
+                document.getElementsByTagName("h1")[0].style.color = TEXTCOLOR[c % 2]
+                c++
+            }
+        }
+    </script>
+</body>
+
+</html>
