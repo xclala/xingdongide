@@ -7,6 +7,7 @@ try:
     from keyword import kwlist
     from threading import Thread
     from win32com.shell import shell, shellcon
+    from windnd import hook_dropfiles
 
     def load():
         from win32ui import CreateFileDialog
@@ -27,6 +28,13 @@ try:
             contents.delete('1.0', END)
             contents.insert(INSERT, file.read())
         top.title("打开" + message.get())
+
+    def dragged_load(files):
+        msg = files[0].decode("gbk")
+        with open(msg, encoding='utf-8') as file:
+            contents.delete('1.0', END)
+            contents.insert(INSERT, file.read())
+        top.title("打开" + msg)
 
     def save():
         from win32ui import CreateFileDialog
@@ -562,6 +570,7 @@ try:
     top = Tk()
     top.title("我的集成开发环境(作者：邢栋)")
     top.geometry('1500x600')
+    hook_dropfiles(top, func=dragged_load)
     menubar = Menu(top)
     contents = ScrolledText(font=40)
     contents.pack(side=BOTTOM, expand=True, fill=BOTH)
