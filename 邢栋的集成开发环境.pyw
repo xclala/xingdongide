@@ -7,7 +7,63 @@ try:
     from keyword import kwlist
     from threading import Thread
     from win32com.shell import shell, shellcon
-    from windnd import hook_dropfiles
+
+    def hook_dropfiles(tkwindow_or_winfoid, func, force_unicode=False):
+        import platform
+        import ctypes
+        from ctypes.wintypes import DWORD
+
+        hwnd = tkwindow_or_winfoid.winfo_id()\
+            if getattr(tkwindow_or_winfoid, "winfo_id", None)\
+            else tkwindow_or_winfoid
+
+        if platform.architecture()[0] == "32bit":
+            GetWindowLong = ctypes.windll.user32.GetWindowLongW
+            SetWindowLong = ctypes.windll.user32.SetWindowLongW
+            argtype = DWORD
+        elif platform.architecture()[0] == "64bit":
+            GetWindowLong = ctypes.windll.user32.GetWindowLongPtrA
+            SetWindowLong = ctypes.windll.user32.SetWindowLongPtrA
+            argtype = ctypes.c_uint64
+
+        prototype = ctypes.WINFUNCTYPE(argtype, argtype, argtype, argtype,
+                                       argtype)
+        WM_DROPFILES = 0x233
+        GWL_WNDPROC = -4
+        create_buffer = ctypes.create_unicode_buffer if force_unicode else ctypes.c_buffer
+        func_DragQueryFile = ctypes.windll.shell32.DragQueryFileW if force_unicode else ctypes.windll.shell32.DragQueryFile
+
+        def py_drop_func(hwnd, msg, wp, lp):
+            global files
+            if msg == WM_DROPFILES:
+                count = func_DragQueryFile(argtype(wp), -1, None, None)
+                szFile = create_buffer(260)
+                files = []
+                for i in range(count):
+                    func_DragQueryFile(argtype(wp), i, szFile,
+                                       ctypes.sizeof(szFile))
+                    dropname = szFile.value
+                    files.append(dropname)
+                func(files)
+                ctypes.windll.shell32.DragFinish(argtype(wp))
+            return ctypes.windll.user32.CallWindowProcW(
+                *map(argtype, (globals()[old], hwnd, msg, wp, lp)))
+
+        # for limit hook number, protect computer.
+        limit_num = 200
+        for i in range(limit_num):
+            if i + 1 == limit_num:
+                raise "over hook limit number 200, for protect computer."
+            if "old_wndproc_%d" % i not in globals():
+                old, new = "old_wndproc_%d" % i, "new_wndproc_%d" % i
+                break
+
+        globals()[old] = None
+        globals()[new] = prototype(py_drop_func)
+
+        ctypes.windll.shell32.DragAcceptFiles(hwnd, True)
+        globals()[old] = GetWindowLong(hwnd, GWL_WNDPROC)
+        SetWindowLong(hwnd, GWL_WNDPROC, globals()[new])
 
     def load():
         from win32ui import CreateFileDialog
@@ -20,8 +76,9 @@ try:
             'Java File(*.java)|*.java|'\
             'Batch File(*.bat *.cmd) |*.bat;*.cmd|'\
             '|'
-        d = CreateFileDialog(1, None, None, OFN_OVERWRITEPROMPT |
-                             OFN_FILEMUSTEXIST, file_open_type)
+        d = CreateFileDialog(1, None, None,
+                             OFN_OVERWRITEPROMPT | OFN_FILEMUSTEXIST,
+                             file_open_type)
         d.SetOFNInitialDir('C:/')
         d.DoModal()
         with open(d.GetPathName(), encoding='utf-8') as file:
@@ -47,8 +104,9 @@ try:
             'Java File(*.java)|*.java|'\
             'Batch File(*.bat) |*.bat|'\
             '|'
-        dd = CreateFileDialog(
-            0, None, None, OFN_OVERWRITEPROMPT | OFN_FILEMUSTEXIST, file_save_type)
+        dd = CreateFileDialog(0, None, None,
+                              OFN_OVERWRITEPROMPT | OFN_FILEMUSTEXIST,
+                              file_save_type)
         dd.SetOFNInitialDir('C:/')
         dd.DoModal()
         with open(dd.GetPathName(), 'w', encoding='utf-8') as file:
@@ -126,8 +184,8 @@ try:
 
     def pip_upgrade():
         top.title("用pip升级" + message.get())
-        system("pip install --upgrade " +
-               message.get() + " --no-cache-dir & pause")
+        system("pip install --upgrade " + message.get() +
+               " --no-cache-dir & pause")
 
     def pip_uninstall():
         top.title("用pip卸载" + message.get())
@@ -140,12 +198,14 @@ try:
 
     def show_all_packages():
         system(
-            "pip list & --no-cache-dir & echo ------------------------------------------ & pause")
+            "pip list & --no-cache-dir & echo ------------------------------------------ & pause"
+        )
         top.title("显示安装的所有第三方包")
 
     def show_upgrade_all_packages():
         system(
-            "pip list -o & --no-cache-dir & echo ------------------------------------------ & pause")
+            "pip list -o & --no-cache-dir & echo ------------------------------------------ & pause"
+        )
         top.title("显示能够更新的所有第三方包")
 
     def upgrade_all_packages():
@@ -218,6 +278,7 @@ try:
         from wx.html2 import WebView
 
         class MAIN(wx.Frame):
+
             def __init__(self, parent, title):
                 wx.Frame.__init__(self, parent, -1, title, size=(1000, 800))
                 WebView.New(self).LoadURL(message.get())
@@ -258,8 +319,8 @@ try:
         top.title("编译运行c程序" + message.get())
 
     def java_compile_run():
-        system("javac " + message.get() + "& java " +
-               message.get() + ".class" + "& pause")
+        system("javac " + message.get() + "& java " + message.get() +
+               ".class" + "& pause")
         top.title("编译运行java程序" + message.get())
 
     def c_i():
@@ -277,8 +338,9 @@ try:
 
     def remv():
         top.title("删除" + message.get())
-        shell.SHFileOperation((0, shellcon.FO_DELETE, message.get(
-        ), None, shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO | shellcon.FOF_NOCONFIRMATION, None, None))
+        shell.SHFileOperation((0, shellcon.FO_DELETE, message.get(), None,
+                               shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
+                               | shellcon.FOF_NOCONFIRMATION, None, None))
 
     def import_colors():
         system("python colors.pyw")
@@ -407,27 +469,32 @@ try:
 
     def process_key(key):
         current_line_num, current_col_num = map(
-            int, contents.index(INSERT).split('.'))
+            int,
+            contents.index(INSERT).split('.'))
         if key.keycode == 13:
             last_line_num = current_line_num - 1
             last_line = contents.get(f'{last_line_num}.0', INSERT).rstrip()
             num = len(last_line) - len(last_line.lstrip(' '))
-            if (last_line.endswith(':') or (':' in last_line and last_line.split(':')[-1].strip().stratswit('#'))):
+            if (last_line.endswith(':')
+                    or (':' in last_line
+                        and last_line.split(':')[-1].strip().stratswit('#'))):
                 num += 4
-            elif last_line.strip().startswith(('return', 'break', 'continue', 'pass', 'raise')):
+            elif last_line.strip().startswith(
+                ('return', 'break', 'continue', 'pass', 'raise')):
                 num -= 4
             contents.insert(INSERT, ' ' * num)
         elif key.keysym == 'Backspace':
             current_line = contents.get(
-                f'{current_line_num}.0', f'{current_line_num}.{current_col_num}')
+                f'{current_line_num}.0',
+                f'{current_line_num}.{current_col_num}')
             num = len(current_line) - len(current_line.rstrip(' '))
             num = min(3, num)
             if num > 1:
                 contents.delete(f'{current_line_num}.{current_col_num-num}',
                                 f'{current_line_num}.{current_col_num}')
         else:
-            lines = contents.get('0.0', END).rstrip(
-                '\n').splitlines(keepends=True)
+            lines = contents.get('0.0',
+                                 END).rstrip('\n').splitlines(keepends=True)
             contents.delete('0.0', END)
             for line in lines:
                 flag1, flag2, flag3 = False, False, False
@@ -452,8 +519,8 @@ try:
                                 else:
                                     contents.insert(INSERT, word)
                             if ch == '#':
-                                contents.insert(
-                                    INSERT, line[index:], 'comment')
+                                contents.insert(INSERT, line[index:],
+                                                'comment')
                                 break
                             else:
                                 contents.insert(INSERT, ch)
@@ -470,8 +537,8 @@ try:
                         contents.insert(INSERT, word, 'kw')
                     else:
                         contents.insert(INSERT, word)
-            contents.mark_set(
-                'insert', f'{current_line_num}.{current_col_num}')
+            contents.mark_set('insert',
+                              f'{current_line_num}.{current_col_num}')
 
     def other_theme():
         contents.bind('<KeyRelease>', process_key)
@@ -510,6 +577,7 @@ try:
         top.title("把go程序编译成exe文件")
 
     class MyThread(Thread):
+
         def __init__(self, func, *args):
             super().__init__()
             self.func = func
@@ -544,16 +612,16 @@ try:
         system("bpython")
 
     def mypy_type():
-        system("mypy "+message.get())
+        system("mypy " + message.get())
 
     def pyenv_install():
-        system("pyenv install "+message.get())
+        system("pyenv install " + message.get())
 
     def pyenv_uninstall():
-        system("pyenv uninstall "+message.get())
+        system("pyenv uninstall " + message.get())
 
     def pyenv_update():
-        system("pyenv update "+message.get())
+        system("pyenv update " + message.get())
 
     def pythonorg():
         from webbrowser import open
@@ -565,6 +633,7 @@ try:
 
     def pyenv_list():
         system("pyenv install -l")
+
     bifs = dir(__builtins__)
     kws = kwlist
     top = Tk()
@@ -625,8 +694,8 @@ try:
                       command=lambda: MyThread(requirement_install))
     menu2.add_command(label='下载安装包', command=lambda: MyThread(pip_download))
     menu2.add_command(label='卸载', command=pip_uninstall)
-    menu2.add_command(
-        label='重新安装', command=lambda: MyThread(pip_install_uninstall))
+    menu2.add_command(label='重新安装',
+                      command=lambda: MyThread(pip_install_uninstall))
     menu2.add_command(label='升级', command=lambda: MyThread(pip_upgrade))
     menu2.add_command(label='安装', command=lambda: MyThread(pip_install))
     menubar.add_cascade(label="python第三方包软件商店", menu=menu2)
@@ -727,21 +796,23 @@ try:
     Button(text='浏览器', command=lambda: MyThread(liulanqi)).pack(side=RIGHT)
     Button(text='计算器', command=lambda: MyThread(calc)).pack(side=RIGHT)
     Button(text='添加到任务栏', command=labl).pack(side=RIGHT)
-    Button(text='死亡之ping', command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
-    Button(text='有道翻译器', command=lambda: MyThread(
-        import_fanyi)).pack(side=RIGHT)
+    Button(text='死亡之ping',
+           command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
+    Button(text='有道翻译器',
+           command=lambda: MyThread(import_fanyi)).pack(side=RIGHT)
     Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
     Button(text='用setuptools打包(需先填写setup.py)',
            command=lambda: MyThread(pythonsetuptools)).pack(side=RIGHT)
-    Button(text='颜色表', command=lambda: MyThread(
-        import_colors)).pack(side=RIGHT)
+    Button(text='颜色表',
+           command=lambda: MyThread(import_colors)).pack(side=RIGHT)
     Button(text='修改标题', command=tit)
     Button(text='启动80端口服务器', command=serv).pack(side=RIGHT)
     Button(text='类型检查', command=lambda: MyThread(mypy_type)).pack(side=RIGHT)
     Button(text='百度', command=lambda: MyThread(baidu)).pack(side=RIGHT)
-    Button(text='python官网', command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
-    Button(text='python版本', command=lambda: MyThread(
-        python_version)).pack(side=LEFT)
+    Button(text='python官网',
+           command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
+    Button(text='python版本',
+           command=lambda: MyThread(python_version)).pack(side=LEFT)
     mainloop()
 except Exception as e:
     print(e)
