@@ -2,7 +2,7 @@ try:
     from tkinter import *
     from tkinter import messagebox
     from tkinter.scrolledtext import ScrolledText
-    from os import system, getcwd
+    from os import system, getcwd, popen
     import string
     from keyword import kwlist
     from threading import Thread
@@ -233,7 +233,8 @@ try:
         top.title("用pip下载" + message.get())
 
     def start():
-        system("python 邢栋的集成开发环境.pyw")
+        with popen("python 邢栋的集成开发环境.pyw") as _:
+            print(_.read())
 
     def python_run():
         system("python " + message.get() + "& echo ------------------ & pause")
@@ -289,10 +290,12 @@ try:
         app.MainLoop()
 
     def calc():
-        system("calc")
+        with popen("calc") as _:
+            print(_.read())
 
     def slidetoshutdown():
-        system("slidetoshutdown")
+        with popen("slidetoshutdown") as _:
+            print(_.read())
 
     def pythonsetuptools():
         system("python setup.py " + message.get())
@@ -343,7 +346,8 @@ try:
                                | shellcon.FOF_NOCONFIRMATION, None, None))
 
     def import_colors():
-        system("python colors.pyw")
+        with popen("python colors.pyw") as _:
+            print(_.read())
         top.title("颜色表")
 
     def pyttsx3_say_messages():
@@ -362,7 +366,8 @@ try:
         lbl.pack(side=LEFT)
 
     def import_fanyi():
-        system("python youdaofanyi.pyw")
+        with popen("python youdaofanyi.pyw") as _:
+            print(_.read())
         top.title("有道翻译器")
 
     def pydoc1():
@@ -399,10 +404,12 @@ try:
         system("python -i " + message.get())
 
     def hide():
-        system("attrib +H " + message.get())
+        with popen("attrib +H " + message.get()) as _:
+            print(_.read())
 
     def unhide():
-        system("attrib -H " + message.get())
+        with popen("attrib -H " + message.get()) as _:
+            print(_.read())
 
     def serv():
         system("server")
@@ -411,7 +418,8 @@ try:
         system("py -m cProfile " + message.get() + "& pause")
 
     def dirdir():
-        system("python dirr.pyw")
+        with popen("python dirr.pyw") as _:
+            print(_.read())
 
     def yapfyapf():
         system("yapf -i " + message.get())
@@ -434,8 +442,9 @@ try:
         system("attrib -R " + message.get())
 
     def python_version():
+        from platform import python_version
+        messagebox.showinfo("python版本", python_version())
         top.title("python版本")
-        system("python -V & pause")
 
     def pyttsx3_file_byte():
         top.title("读出字节数")
@@ -465,7 +474,8 @@ try:
             top.destroy()
 
     def TREE():
-        system("python tre.pyw")
+        with popen("python tre.pyw") as _:
+            print(_.read())
 
     def process_key(key):
         current_line_num, current_col_num = map(
@@ -638,7 +648,7 @@ try:
     kws = kwlist
     top = Tk()
     top.title("我的集成开发环境(作者：邢栋)")
-    top.geometry('1500x600')
+    top.geometry('1520x700')
     hook_dropfiles(top, func=dragged_load)
     menubar = Menu(top)
     contents = ScrolledText(font=40)
@@ -806,7 +816,7 @@ try:
     Button(text='颜色表',
            command=lambda: MyThread(import_colors)).pack(side=RIGHT)
     Button(text='修改标题', command=tit)
-    Button(text='启动80端口服务器', command=serv).pack(side=RIGHT)
+    Button(text='启动80端口服务器', command=lambda: MyThread(serv)).pack(side=RIGHT)
     Button(text='类型检查', command=lambda: MyThread(mypy_type)).pack(side=RIGHT)
     Button(text='百度', command=lambda: MyThread(baidu)).pack(side=RIGHT)
     Button(text='python官网',
