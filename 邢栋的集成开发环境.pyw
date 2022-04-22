@@ -7,6 +7,7 @@ try:
     from keyword import kwlist
     from threading import Thread
     from win32com.shell import shell, shellcon
+    opened_file_path = ""
 
     def hook_dropfiles(tkwindow_or_winfoid, func, force_unicode=False):
         import platform
@@ -81,19 +82,31 @@ try:
                              file_open_type)
         d.SetOFNInitialDir('C:/')
         d.DoModal()
-        with open(d.GetPathName(), encoding='utf-8') as file:
+        global opened_file_path
+        opened_file_path = d.GetPathName()
+        with open(opened_file_path, encoding='utf-8') as file:
             contents.delete('1.0', END)
             contents.insert(INSERT, file.read())
-        top.title("打开" + message.get())
+        top.title("打开" + opened_file_path)
 
     def dragged_load(files):
-        msg = files[0].decode("gbk")
-        with open(msg, encoding='utf-8') as file:
+        global opened_file_path
+        opened_file_path = files[0].decode("gbk")
+        with open(opened_file_path, encoding='utf-8') as file:
             contents.delete('1.0', END)
             contents.insert(INSERT, file.read())
-        top.title("打开" + msg)
+        top.title("打开" + opened_file_path)
 
     def save():
+        global opened_file_path
+        if opened_file_path:
+            with open(opened_file_path, 'w', encoding='utf-8') as file:
+                file.write(contents.get('1.0', END))
+            top.title("保存" + opened_file_path)
+        else:
+            resave()
+
+    def resave():
         from win32ui import CreateFileDialog
         from win32con import OFN_OVERWRITEPROMPT, OFN_FILEMUSTEXIST
         file_save_type = 'All File(*.*)|*.*|'\
@@ -111,52 +124,7 @@ try:
         dd.DoModal()
         with open(dd.GetPathName(), 'w', encoding='utf-8') as file:
             file.write(contents.get('1.0', END))
-        top.title("保存" + message.get())
-
-    def python_save():
-        with open(message.get() + ".py", 'w', encoding='utf-8') as file:
-            file.write(contents.get('1.0', END))
-        top.title("以命令行的python格式保存" + message.get())
-
-    def pythonw_save():
-        with open(message.get() + ".pyw", 'w', encoding='utf-8') as file:
-            file.write(contents.get('1.0', END))
-        top.title("以可视化的python格式保存" + message.get())
-
-    def c_save():
-        with open(message.get() + ".c", 'w', encoding='utf-8') as file:
-            file.write(contents.get('1.0', END))
-        top.title("以c语言的格式保存")
-
-    def cpp_save():
-        with open(message.get() + ".cpp", 'w', encoding='utf-8') as file:
-            file.write(contents.get('1.0', END))
-        top.title("以c++语言的格式保存")
-
-    def go_save():
-        with open(message.get() + ".go", 'w', encoding='utf-8') as file:
-            file.write(contents.get('1.0', END))
-        top.title("以go语言的格式保存")
-
-    def java_save():
-        with open(message.get() + ".java", 'w', encoding='utf-8') as file:
-            file.write(contents.get('1.0', END))
-        top.title("以java语言的格式保存")
-
-    def html_save():
-        with open(message.get() + ".htm", 'w', encoding='utf-8') as file:
-            file.write(contents.get('1.0', END))
-        top.title("以html的格式保存")
-
-    def h_save():
-        with open(message.get() + ".h", 'w', encoding='utf-8') as file:
-            file.write(contents.get('1.0', END))
-        top.title("以c语言头文件的格式保存")
-
-    def bat_save():
-        with open(message.get() + ".bat", 'w', encoding='utf-8') as file:
-            file.write(contents.get('1.0', END))
-        top.title("以批处理文件的格式保存")
+        top.title("另存为" + dd.GetPathName())
 
     def md():
         from os import mkdir
@@ -237,25 +205,33 @@ try:
             print(_.read())
 
     def python_run():
-        system("python " + message.get() + "& echo ------------------ & pause")
-        top.title("用python运行" + message.get())
+        global opened_file_path
+        system("python " + opened_file_path +
+               "& echo ------------------ & pause")
+        top.title("用python运行" + opened_file_path)
 
     def c_compile():
-        system("gcc -O3 " + message.get() +
+        global opened_file_path
+        system("gcc -O3 " + opened_file_path +
                "& echo ------------------ & pause")
-        top.title("编译优化" + message.get())
+        top.title("编译优化" + opened_file_path)
 
     def run():
-        system(message.get())
-        top.title("运行" + message.get())
+        global opened_file_path
+        system(opened_file_path)
+        top.title("运行" + opened_file_path)
 
     def java_compile():
-        system("javac " + message.get() + "& echo ------------------ & pause")
-        top.title("java编译" + message.get())
+        global opened_file_path
+        system("javac " + opened_file_path +
+               "& echo ------------------ & pause")
+        top.title("java编译" + opened_file_path)
 
     def java_run():
-        system("java " + message.get() + "& echo ------------------ & pause")
-        top.title("java运行" + message.get())
+        global opened_file_path
+        system("java " + opened_file_path +
+               "& echo ------------------ & pause")
+        top.title("java运行" + opened_file_path)
 
     def dos():
         system("cmd")
@@ -267,12 +243,14 @@ try:
         system("ipython")
 
     def pyinstaller_exe_c():
-        system("pyinstaller -F " + message.get() + "& pause")
-        top.title(message.get())
+        global opened_file_path
+        system("pyinstaller -F " + opened_file_path + "& pause")
+        top.title("用pyinstaller打包命令行" + opened_file_path)
 
     def pyinstaller_exe_w():
-        system("pyinstaller -F -w " + message.get() + "& pause")
-        top.title(message.get())
+        global opened_file_path
+        system("pyinstaller -F -w " + opened_file_path + "& pause")
+        top.title("用pyinstaller打包可视化" + opened_file_path)
 
     def liulanqi():
         import wx
@@ -293,10 +271,6 @@ try:
         with popen("calc") as _:
             print(_.read())
 
-    def slidetoshutdown():
-        with popen("slidetoshutdown") as _:
-            print(_.read())
-
     def pythonsetuptools():
         system("python setup.py " + message.get())
         top.title("python用setuptools打包" + message.get())
@@ -310,29 +284,34 @@ try:
         top.title("目标IP:" + message.get())
 
     def ipython_run():
-        system("ipython " + message.get() +
+        global opened_file_path
+        system("ipython " + opened_file_path +
                "& echo ------------------ & pause")
-        top.title("用ipython运行" + message.get())
+        top.title("用ipython运行" + opened_file_path)
 
     def psl():
         system("powershell")
 
     def c_compile_run():
-        system("gcc -O3 " + message.get() + "& a & pause")
-        top.title("编译运行c程序" + message.get())
+        global opened_file_path
+        system("gcc -O3 " + opened_file_path + "-o a.exe & a & pause")
+        top.title("编译运行c程序" + opened_file_path)
 
     def java_compile_run():
-        system("javac " + message.get() + "& java " + message.get() +
+        global opened_file_path
+        system("javac " + opened_file_path + "& java " + opened_file_path +
                ".class" + "& pause")
-        top.title("编译运行java程序" + message.get())
+        top.title("编译运行java程序" + opened_file_path)
 
     def c_i():
-        system("gcc -O3 -E " + message.get() + " -o a.i")
-        top.title(message.get())
+        global opened_file_path
+        system("gcc -O3 -E " + opened_file_path + " -o a.i")
+        top.title(opened_file_path)
 
     def c_s_intel():
-        system("gcc -O3 -S -masm=intel " + message.get() + " -o a.s")
-        top.title("把" + message.get() + "编译成intel的汇编语言")
+        global opened_file_path
+        system("gcc -O3 -S -masm=intel " + opened_file_path + " -o a.s")
+        top.title("把" + opened_file_path + "编译成intel的汇编语言")
 
     def rm():
         from os import remove
@@ -365,8 +344,8 @@ try:
         lbl = Label(text=message.get())
         lbl.pack(side=LEFT)
 
-    def import_fanyi():
-        with popen("python youdaofanyi.pyw") as _:
+    def youdao_translate():
+        with popen("python youdao_translate.pyw") as _:
             print(_.read())
         top.title("有道翻译器")
 
@@ -446,16 +425,12 @@ try:
         messagebox.showinfo("python版本", python_version())
         top.title("python版本")
 
-    def pyttsx3_file_byte():
-        top.title("读出字节数")
-        import pyttsx3
-        import os
-        eee = pyttsx3.init()
-        eee.say("约" + str(os.path.getsize(message.get())) + "字节")
-        eee.runAndWait()
-
-    def shutdown():
-        system("shutdown /s /t " + message.get())
+    def alert_file_byte():
+        global opened_file_path
+        from os.path import getsize
+        top.title("显示字节数")
+        messagebox.showinfo("约" + str(getsize(opened_file_path)) + "字节",
+                            "约" + str(getsize(opened_file_path)) + "字节")
 
     def pip_help():
         system("pip help & pause")
@@ -470,7 +445,10 @@ try:
         system("coverage html -d report" + "& pause")
 
     def on_closing():
-        if messagebox.askokcancel("退出", "你确定要退出吗？不要忘了保存！"):
+        if contents.get('1.0', END).strip():
+            save()
+            top.destroy()
+        else:
             top.destroy()
 
     def TREE():
@@ -665,24 +643,17 @@ try:
     menu1 = Menu(menubar, tearoff=False)
     menu1.add_command(label='打开文件', command=lambda: MyThread(load))
     menu1.add_command(label='保存文件', command=lambda: MyThread(save))
+    menu1.add_command(label='另存为文件', command=lambda: MyThread(resave))
     menu1.add_command(label='隐藏文件', command=hide)
     menu1.add_command(label='恢复隐藏的文件', command=unhide)
     menu1.add_command(label='只读文件', command=read_only)
     menu1.add_command(label='解除只读文件', command=not_read_only)
-    menu1.add_command(label='读出字节数', command=pyttsx3_file_byte)
+    menu1.add_command(label='显示字节数', command=alert_file_byte)
     menu1.add_command(label='创建文件夹', command=md)
     menu1.add_command(label='删除文件夹', command=rd)
     menu1.add_command(label='创建递归文件夹', command=mds)
     menu1.add_command(label='删除递归文件夹', command=rds)
     menu1.add_command(label='清理python缓存', command=python_cache)
-    menu1.add_command(label='以命令行的python格式保存文件(.py)', command=python_save)
-    menu1.add_command(label='以可视化的python格式保存文件(.pyw)', command=pythonw_save)
-    menu1.add_command(label='以c语言的格式保存(.c)', command=c_save)
-    menu1.add_command(label='以c++语言的格式保存(.cpp)', command=cpp_save)
-    menu1.add_command(label='以java语言的格式保存(.java)', command=java_save)
-    menu1.add_command(label='以html的格式保存(.htm)', command=html_save)
-    menu1.add_command(label='以c语言头文件的格式保存(.h)', command=h_save)
-    menu1.add_command(label='以批处理文件的格式保存(.bat)', command=bat_save)
     menu1.add_command(label='删除文件', command=remv)
     menu1.add_command(label='永久删除文件', command=rm)
     menubar.add_cascade(label="文本编辑", menu=menu1)
@@ -777,30 +748,25 @@ try:
     menubar.add_cascade(label='python代码规范', menu=menu11)
     top.config(menu=menubar)
     menu12 = Menu(menubar, tearoff=False)
-    menu12.add_command(label='滑动关机', command=slidetoshutdown)
-    menu12.add_command(label='定时关机', command=shutdown)
-    menubar.add_cascade(label='关机', menu=menu12)
+    menu12.add_command(label='生成测试文件并运行', command=coverage_run)
+    menu12.add_command(label='显示结果', command=coverage_report)
+    menu12.add_command(label='生成html文件夹', command=coverage_html)
+    menubar.add_cascade(label='python测试覆盖率', menu=menu12)
     top.config(menu=menubar)
     menu13 = Menu(menubar, tearoff=False)
-    menu13.add_command(label='生成测试文件并运行', command=coverage_run)
-    menu13.add_command(label='显示结果', command=coverage_report)
-    menu13.add_command(label='生成html文件夹', command=coverage_html)
-    menubar.add_cascade(label='python测试覆盖率', menu=menu13)
+    menu13.add_command(label='init', command=git_init)
+    menu13.add_command(label='add', command=git_add)
+    menu13.add_command(label='clone', command=git_clone)
+    menu13.add_command(label='commit', command=git_commit)
+    menu13.add_command(label='diff', command=git_diff)
+    menubar.add_cascade(label='git', menu=menu13)
     top.config(menu=menubar)
     menu14 = Menu(menubar, tearoff=False)
-    menu14.add_command(label='init', command=git_init)
-    menu14.add_command(label='add', command=git_add)
-    menu14.add_command(label='clone', command=git_clone)
-    menu14.add_command(label='commit', command=git_commit)
-    menu14.add_command(label='diff', command=git_diff)
-    menubar.add_cascade(label='git', menu=menu14)
-    top.config(menu=menubar)
-    menu15 = Menu(menubar, tearoff=False)
-    menu15.add_command(label='安装', command=lambda: MyThread(pyenv_install))
-    menu15.add_command(label='卸载', command=lambda: MyThread(pyenv_uninstall))
-    menu15.add_command(label='更新', command=lambda: MyThread(pyenv_update))
-    menu15.add_command(label='能安装的目录', command=lambda: MyThread(pyenv_list))
-    menubar.add_cascade(label='pyenv', menu=menu15)
+    menu14.add_command(label='安装', command=lambda: MyThread(pyenv_install))
+    menu14.add_command(label='卸载', command=lambda: MyThread(pyenv_uninstall))
+    menu14.add_command(label='更新', command=lambda: MyThread(pyenv_update))
+    menu14.add_command(label='能安装的目录', command=lambda: MyThread(pyenv_list))
+    menubar.add_cascade(label='pyenv', menu=menu14)
     top.config(menu=menubar)
     Button(text='再启动一个窗口', command=lambda: MyThread(start)).pack(side=RIGHT)
     Button(text='浏览器', command=lambda: MyThread(liulanqi)).pack(side=RIGHT)
@@ -809,7 +775,7 @@ try:
     Button(text='死亡之ping',
            command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
     Button(text='有道翻译器',
-           command=lambda: MyThread(import_fanyi)).pack(side=RIGHT)
+           command=lambda: MyThread(youdao_translate)).pack(side=RIGHT)
     Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
     Button(text='用setuptools打包(需先填写setup.py)',
            command=lambda: MyThread(pythonsetuptools)).pack(side=RIGHT)
