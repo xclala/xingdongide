@@ -233,15 +233,6 @@ try:
                "& echo ------------------ & pause")
         top.title("java运行" + opened_file_path)
 
-    def dos():
-        system("cmd")
-
-    def python():
-        system("python")
-
-    def ipython():
-        system("ipython")
-
     def pyinstaller_exe_c():
         global opened_file_path
         system("pyinstaller -F " + opened_file_path + "& pause")
@@ -288,9 +279,6 @@ try:
         system("ipython " + opened_file_path +
                "& echo ------------------ & pause")
         top.title("用ipython运行" + opened_file_path)
-
-    def psl():
-        system("powershell")
 
     def c_compile_run():
         global opened_file_path
@@ -391,12 +379,6 @@ try:
 
     def requirement_install():
         system("pip install -r requirement.txt & pause")
-
-    def pt_python():
-        system("ptpython")
-
-    def pt_ipython():
-        system("ptipython")
 
     def read_only():
         top.title("只读" + message.get())
@@ -582,9 +564,6 @@ try:
         system("git clone " + message.get() + " & pause")
         top.title("git clone")
 
-    def bpython():
-        system("bpython")
-
     def mypy_type():
         system("mypy " + message.get())
 
@@ -684,13 +663,13 @@ try:
     menubar.add_cascade(label="编译与运行", menu=menu3)
     top.config(menu=menubar)
     menu4 = Menu(menubar, tearoff=False)
-    menu4.add_command(label='dos', command=lambda: MyThread(dos))
-    menu4.add_command(label='python', command=lambda: MyThread(python))
-    menu4.add_command(label='ipython', command=lambda: MyThread(ipython))
-    menu4.add_command(label='ptpython', command=lambda: MyThread(pt_python))
-    menu4.add_command(label='ptipython', command=lambda: MyThread(pt_ipython))
-    menu4.add_command(label='bpython', command=lambda: MyThread(bpython))
-    menu4.add_command(label='powershell', command=lambda: MyThread(psl))
+    menu4.add_command(label='dos', command=lambda: MyThread(system("cmd")))
+    menu4.add_command(label='python', command=lambda: MyThread(system("python")))
+    menu4.add_command(label='ipython', command=lambda: MyThread(system("ipython")))
+    menu4.add_command(label='ptpython', command=lambda: MyThread(system("ptpython")))
+    menu4.add_command(label='ptipython', command=lambda: MyThread(system("ptipython")))
+    menu4.add_command(label='bpython', command=lambda: MyThread(system("bpython")))
+    menu4.add_command(label='powershell', command=lambda: MyThread(system("powershell")))
     menubar.add_cascade(label="命令行", menu=menu4)
     top.config(menu=menubar)
     menu5 = Menu(menubar, tearoff=False)
