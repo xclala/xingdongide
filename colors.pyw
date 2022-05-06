@@ -1,4 +1,5 @@
 from tkinter import *
+
 colors = '''#FFB6C1 LightPink 浅粉红
 #FFC0CB Pink 粉红
 #DC143C Crimson 深红/猩红
@@ -139,13 +140,15 @@ colors = '''#FFB6C1 LightPink 浅粉红
 #808080 Gray 灰色
 #696969 DimGray 暗淡灰
 #000000 Black 纯黑'''
-root=Tk()
+root = Tk()
 root.title("颜色")
 root.geometry('970x900')
 i = 0
 colcut = 4
 for color in colors.split('\n'):
     sp = color.split(' ')
-    Label(text=color, bg=sp[1]).grid(row=int(i/colcut),column=i%colcut, sticky=W+E+N+S)
+    Label(text=color, bg=sp[1]).grid(row=int(i / colcut),
+                                     column=i % colcut,
+                                     sticky=W + E + N + S)
     i += 1
 root.mainloop()

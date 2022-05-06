@@ -8,16 +8,13 @@ try:
     top.geometry('500x30')
 
     def fanyi():
-        data = {
-            'doctype': 'json',
-            'type': 'AUTO',
-            'i': string.get()
-        }
+        data = {'doctype': 'json', 'type': 'AUTO', 'i': string.get()}
         url = "http://fanyi.youdao.com/translate"
         r = requests.get(url, params=data)
         result = r.json()
         translate_result = result['translateResult'][0][0]["tgt"]
         messagebox.showinfo(title='翻译结果', message=translate_result)
+
     label = Label(text='请输入文字:')
     label.pack(side=LEFT)
     c = ScrolledText()

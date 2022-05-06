@@ -650,20 +650,28 @@ try:
     menu3.add_command(label='运行.exe或.bat程序', command=lambda: MyThread(run))
     menu3.add_command(label='编译运行c程序', command=lambda: MyThread(c_compile_run))
     menu3.add_command(label='运行go程序', command=lambda: MyThread(go_run))
-    menu3.add_command(label='把go程序编译成exe文件', command=lambda: MyThread(go_build))
+    menu3.add_command(label='把go程序编译成exe文件',
+                      command=lambda: MyThread(go_build))
     menu3.add_command(label='编译java程序', command=lambda: MyThread(java_compile))
     menu3.add_command(label='运行java程序', command=lambda: MyThread(java_run))
-    menu3.add_command(label='编译运行java程序', command=lambda: MyThread(java_compile_run))
+    menu3.add_command(label='编译运行java程序',
+                      command=lambda: MyThread(java_compile_run))
     menubar.add_cascade(label="编译与运行", menu=menu3)
     top.config(menu=menubar)
     menu4 = Menu(menubar, tearoff=False)
     menu4.add_command(label='dos', command=lambda: MyThread(system("cmd")))
-    menu4.add_command(label='python', command=lambda: MyThread(system("python")))
-    menu4.add_command(label='ipython', command=lambda: MyThread(system("ipython")))
-    menu4.add_command(label='ptpython', command=lambda: MyThread(system("ptpython")))
-    menu4.add_command(label='ptipython', command=lambda: MyThread(system("ptipython")))
-    menu4.add_command(label='bpython', command=lambda: MyThread(system("bpython")))
-    menu4.add_command(label='powershell', command=lambda: MyThread(system("powershell")))
+    menu4.add_command(label='python',
+                      command=lambda: MyThread(system("python")))
+    menu4.add_command(label='ipython',
+                      command=lambda: MyThread(system("ipython")))
+    menu4.add_command(label='ptpython',
+                      command=lambda: MyThread(system("ptpython")))
+    menu4.add_command(label='ptipython',
+                      command=lambda: MyThread(system("ptipython")))
+    menu4.add_command(label='bpython',
+                      command=lambda: MyThread(system("bpython")))
+    menu4.add_command(label='powershell',
+                      command=lambda: MyThread(system("powershell")))
     menubar.add_cascade(label="命令行", menu=menu4)
     top.config(menu=menubar)
     menu5 = Menu(menubar, tearoff=False)
@@ -703,9 +711,11 @@ try:
     menubar.add_cascade(label='python代码规范', menu=menu10)
     top.config(menu=menubar)
     menu11 = Menu(menubar, tearoff=False)
-    menu11.add_command(label='生成测试文件并运行', command=lambda: MyThread(coverage_run))
+    menu11.add_command(label='生成测试文件并运行',
+                       command=lambda: MyThread(coverage_run))
     menu11.add_command(label='显示结果', command=lambda: MyThread(coverage_report))
-    menu11.add_command(label='生成html文件夹', command=lambda: MyThread(coverage_html))
+    menu11.add_command(label='生成html文件夹',
+                       command=lambda: MyThread(coverage_html))
     menubar.add_cascade(label='python测试覆盖率', menu=menu11)
     top.config(menu=menubar)
     menu12 = Menu(menubar, tearoff=False)
