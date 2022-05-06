@@ -134,14 +134,6 @@ try:
         from os import rmdir
         rmdir(message.get())
 
-    def mds():
-        from os import makedirs
-        makedirs(message.get())
-
-    def rds():
-        from os import removedirs
-        removedirs(message.get())
-
     def python_cache():
         from os import removedir
         removedir("__pycache__")
@@ -302,13 +294,15 @@ try:
         top.title("把" + opened_file_path + "编译成intel的汇编语言")
 
     def rm():
+        global open_file_path
         from os import remove
-        remove(message.get())
-        top.title("已永久删除" + message.get())
+        remove(open_file_path)
+        top.title("已永久删除" + open_file_path)
 
     def remv():
-        top.title("删除" + message.get())
-        shell.SHFileOperation((0, shellcon.FO_DELETE, message.get(), None,
+        global open_file_path
+        top.title("删除" + open_file_path)
+        shell.SHFileOperation((0, shellcon.FO_DELETE, open_file_path, None,
                                shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
                                | shellcon.FOF_NOCONFIRMATION, None, None))
 
@@ -318,12 +312,9 @@ try:
         top.title("颜色表")
 
     def pcs():
-        system("pycodestyle " + message.get() + "& pause")
-        top.title(message.get())
-
-    def labl():
-        lbl = Label(text=message.get())
-        lbl.pack(side=LEFT)
+        global open_file_path
+        system("pycodestyle " + open_file_path + "& pause")
+        top.title(open_file_path)
 
     def youdao_translate():
         with popen("python youdao_translate.pyw") as _:
@@ -375,18 +366,21 @@ try:
             print(_.read())
 
     def yapfyapf():
-        system("yapf -i " + message.get())
+        global opened_file_path
+        system("yapf -i " + opened_file_path)
 
     def requirement_install():
         system("pip install -r requirement.txt & pause")
 
     def read_only():
-        top.title("只读" + message.get())
-        system("attrib +R " + message.get())
+        global opened_file_path
+        top.title("只读" + opened_file_path)
+        system("attrib +R " + opened_file_path)
 
     def not_read_only():
-        top.title("解除只读文件" + message.get())
-        system("attrib -R " + message.get())
+        global opened_file_path
+        top.title("解除只读文件" + opened_file_path)
+        system("attrib -R " + opened_file_path)
 
     def python_version():
         from platform import python_version
@@ -616,12 +610,10 @@ try:
     menu1.add_command(label='显示字节数', command=alert_file_byte)
     menu1.add_command(label='创建文件夹', command=md)
     menu1.add_command(label='删除文件夹', command=rd)
-    menu1.add_command(label='创建递归文件夹', command=mds)
-    menu1.add_command(label='删除递归文件夹', command=rds)
     menu1.add_command(label='清理python缓存', command=python_cache)
     menu1.add_command(label='删除文件', command=remv)
     menu1.add_command(label='永久删除文件', command=rm)
-    menubar.add_cascade(label="文本编辑", menu=menu1)
+    menubar.add_cascade(label="文件管理", menu=menu1)
     top.config(menu=menubar)
     menu2 = Menu(menubar, tearoff=False)
     menu2.add_command(label='提供可选项更新第三方包',
@@ -644,22 +636,24 @@ try:
                       command=lambda: MyThread(pip_install_uninstall))
     menu2.add_command(label='升级', command=lambda: MyThread(pip_upgrade))
     menu2.add_command(label='安装', command=lambda: MyThread(pip_install))
-    menubar.add_cascade(label="python第三方包软件商店", menu=menu2)
+    menubar.add_cascade(label="python第三方包管理器", menu=menu2)
     top.config(menu=menubar)
     menu3 = Menu(menubar, tearoff=False)
-    menu3.add_command(label='运行python程序', command=python_run)
-    menu3.add_command(label='用ipython运行python程序', command=ipython_run)
-    menu3.add_command(label='运行python程序后运行交互式python', command=pythoni)
-    menu3.add_command(label='编译c程序', command=c_compile)
-    menu3.add_command(label='预处理c程序', command=c_i)
-    menu3.add_command(label='编译c程序成汇编语言', command=c_s_intel)
-    menu3.add_command(label='运行.exe或.bat程序', command=run)
-    menu3.add_command(label='编译运行c程序', command=c_compile_run)
-    menu3.add_command(label='运行go程序', command=go_run)
-    menu3.add_command(label='把go程序编译成exe文件', command=go_build)
-    menu3.add_command(label='编译java程序', command=java_compile)
-    menu3.add_command(label='运行java程序', command=java_run)
-    menu3.add_command(label='编译运行java程序', command=java_compile_run)
+    menu3.add_command(label='运行python程序', command=lambda: MyThread(python_run))
+    menu3.add_command(label='用ipython运行python程序',
+                      command=lambda: MyThread(ipython_run))
+    menu3.add_command(label='运行python程序后运行交互式python',
+                      command=lambda: MyThread(pythoni))
+    menu3.add_command(label='编译c程序', command=lambda: MyThread(c_compile))
+    menu3.add_command(label='预处理c程序', command=lambda: MyThread(c_i))
+    menu3.add_command(label='编译c程序成汇编语言', command=lambda: MyThread(c_s_intel))
+    menu3.add_command(label='运行.exe或.bat程序', command=lambda: MyThread(run))
+    menu3.add_command(label='编译运行c程序', command=lambda: MyThread(c_compile_run))
+    menu3.add_command(label='运行go程序', command=lambda: MyThread(go_run))
+    menu3.add_command(label='把go程序编译成exe文件', command=lambda: MyThread(go_build))
+    menu3.add_command(label='编译java程序', command=lambda: MyThread(java_compile))
+    menu3.add_command(label='运行java程序', command=lambda: MyThread(java_run))
+    menu3.add_command(label='编译运行java程序', command=lambda: MyThread(java_compile_run))
     menubar.add_cascade(label="编译与运行", menu=menu3)
     top.config(menu=menubar)
     menu4 = Menu(menubar, tearoff=False)
@@ -703,14 +697,15 @@ try:
     menubar.add_cascade(label='显示目录', menu=menu9)
     top.config(menu=menubar)
     menu10 = Menu(menubar, tearoff=False)
-    menu10.add_command(label='检查python程序规范', command=pcs)
-    menu10.add_command(label='把python代码修改成规范的样子', command=yapfyapf)
+    menu10.add_command(label='检查python程序规范', command=lambda: MyThread(pcs))
+    menu10.add_command(label='把python代码修改成规范的样子',
+                       command=lambda: MyThread(yapfyapf))
     menubar.add_cascade(label='python代码规范', menu=menu10)
     top.config(menu=menubar)
     menu11 = Menu(menubar, tearoff=False)
-    menu11.add_command(label='生成测试文件并运行', command=coverage_run)
-    menu11.add_command(label='显示结果', command=coverage_report)
-    menu11.add_command(label='生成html文件夹', command=coverage_html)
+    menu11.add_command(label='生成测试文件并运行', command=lambda: MyThread(coverage_run))
+    menu11.add_command(label='显示结果', command=lambda: MyThread(coverage_report))
+    menu11.add_command(label='生成html文件夹', command=lambda: MyThread(coverage_html))
     menubar.add_cascade(label='python测试覆盖率', menu=menu11)
     top.config(menu=menubar)
     menu12 = Menu(menubar, tearoff=False)
@@ -731,7 +726,6 @@ try:
     Button(text='再启动一个窗口', command=lambda: MyThread(start)).pack(side=RIGHT)
     Button(text='浏览器', command=lambda: MyThread(liulanqi)).pack(side=RIGHT)
     Button(text='计算器', command=lambda: MyThread(calc)).pack(side=RIGHT)
-    Button(text='添加到任务栏', command=lambda: MyThread(labl)).pack(side=RIGHT)
     Button(text='死亡之ping',
            command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
     Button(text='有道翻译器',
