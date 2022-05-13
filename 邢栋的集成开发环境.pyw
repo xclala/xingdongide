@@ -581,6 +581,12 @@ try:
     def pyenv_list():
         system("pyenv install -l")
 
+    def on_key_release(event):
+        if opened_file_path:
+            save()
+            process_key(event)
+        else:
+            process_key(event)
     bifs = dir(__builtins__)
     kws = kwlist
     top = Tk()
@@ -591,7 +597,7 @@ try:
     contents = ScrolledText(font=40)
     contents.pack(side=BOTTOM, expand=True, fill=BOTH)
     top.protocol("WM_DELETE_WINDOW", on_closing)
-    contents.bind('<KeyRelease>', process_key)
+    contents.bind('<KeyRelease>', on_key_release)
     contents.tag_config('bif', foreground='tomato')
     contents.tag_config('kw', foreground='deepskyblue')
     contents.tag_config('comment', foreground='purple')
