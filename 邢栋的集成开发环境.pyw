@@ -2,7 +2,8 @@ try:
     from tkinter import *
     from tkinter import messagebox
     from tkinter.scrolledtext import ScrolledText
-    from os import system, getcwd, popen
+    from os import system, popen
+    from os.path import abspath
     import string
     from keyword import kwlist
     from threading import Thread
@@ -102,7 +103,7 @@ try:
         if opened_file_path:
             with open(opened_file_path, 'w', encoding='utf-8') as file:
                 file.write(contents.get('1.0', END))
-            top.title("保存" + opened_file_path)
+            top.title("已保存" + opened_file_path)
         else:
             resave()
 
@@ -193,7 +194,7 @@ try:
         top.title("用pip下载" + message.get())
 
     def start():
-        with popen("python 邢栋的集成开发环境.pyw") as _:
+        with popen(f"python {abspath(__file__)}") as _:
             print(_.read())
 
     def python_run():
@@ -253,10 +254,6 @@ try:
     def calc():
         with popen("calc") as _:
             print(_.read())
-
-    def pythonsetuptools():
-        system("python setup.py " + message.get())
-        top.title("python用setuptools打包" + message.get())
 
     def vtenv():
         system("python -m venv " + message.get())
@@ -590,7 +587,7 @@ try:
     bifs = dir(__builtins__)
     kws = kwlist
     top = Tk()
-    top.title("我的集成开发环境(作者：邢栋)")
+    top.title("邢栋的集成开发环境")
     top.geometry('1520x700')
     hook_dropfiles(top, func=dragged_load)
     menubar = Menu(top)
@@ -598,11 +595,14 @@ try:
     contents.pack(side=BOTTOM, expand=True, fill=BOTH)
     top.protocol("WM_DELETE_WINDOW", on_closing)
     contents.bind('<KeyRelease>', on_key_release)
+    contents.bind('<Control-o>', lambda event:load())
+    contents.bind('<Control-S>', lambda event:resave())#Ctrl+Shift+s
+    contents.bind('<Control-N>', lambda event:start())#Ctrl+Shift+n
     contents.tag_config('bif', foreground='tomato')
     contents.tag_config('kw', foreground='deepskyblue')
     contents.tag_config('comment', foreground='purple')
     contents.tag_config('string', foreground='green')
-    Label(text=getcwd(), fg='red').pack(side=LEFT)
+    Label(text=abspath(__file__), fg='red').pack(side=LEFT)
     message = Entry(font=40)
     message.pack(side=LEFT, expand=True, fill=X)
     menu1 = Menu(menubar, tearoff=False)
@@ -747,8 +747,6 @@ try:
     Button(text='有道翻译器',
            command=lambda: MyThread(youdao_translate)).pack(side=RIGHT)
     Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
-    Button(text='用setuptools打包(需先填写setup.py)',
-           command=lambda: MyThread(pythonsetuptools)).pack(side=RIGHT)
     Button(text='颜色表',
            command=lambda: MyThread(import_colors)).pack(side=RIGHT)
     Button(text='修改标题', command=tit)
