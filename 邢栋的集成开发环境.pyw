@@ -308,11 +308,6 @@ try:
             print(_.read())
         top.title("颜色表")
 
-    def pcs():
-        global open_file_path
-        system("pycodestyle " + open_file_path + "& pause")
-        top.title(open_file_path)
-
     def youdao_translate():
         with popen("python youdao_translate.pyw") as _:
             print(_.read())
@@ -558,15 +553,6 @@ try:
     def mypy_type():
         system("mypy " + message.get())
 
-    def pyenv_install():
-        system("pyenv install " + message.get())
-
-    def pyenv_uninstall():
-        system("pyenv uninstall " + message.get())
-
-    def pyenv_update():
-        system("pyenv update " + message.get())
-
     def pythonorg():
         from webbrowser import open
         open("https://www.python.org/")
@@ -574,9 +560,6 @@ try:
     def baidu():
         from webbrowser import open
         open(f"https://www.baidu.com/s?wd={message.get()}&ie=utf-8")
-
-    def pyenv_list():
-        system("pyenv install -l")
 
     def on_key_release(event):
         if opened_file_path:
@@ -650,6 +633,10 @@ try:
                       command=lambda: MyThread(ipython_run))
     menu3.add_command(label='运行python程序后运行交互式python',
                       command=lambda: MyThread(pythoni))
+    menu3.add_command(label='把python程序编译成命令行的exe',
+                    command=lambda: MyThread(pyinstaller_exe_c))
+    menu3.add_command(label='把python程序编译成可视化的exe',
+                      command=lambda: MyThread(pyinstaller_exe_w))
     menu3.add_command(label='编译c程序', command=lambda: MyThread(c_compile))
     menu3.add_command(label='预处理c程序', command=lambda: MyThread(c_i))
     menu3.add_command(label='编译c程序成汇编语言', command=lambda: MyThread(c_s_intel))
@@ -680,13 +667,6 @@ try:
                       command=lambda: MyThread(system("powershell")))
     menubar.add_cascade(label="命令行", menu=menu4)
     top.config(menu=menubar)
-    menu5 = Menu(menubar, tearoff=False)
-    menu5.add_command(label='把python程序编译成命令行的exe',
-                      command=lambda: MyThread(pyinstaller_exe_c))
-    menu5.add_command(label='把python程序编译成可视化的exe',
-                      command=lambda: MyThread(pyinstaller_exe_w))
-    menubar.add_cascade(label="把python程序编译成exe", menu=menu5)
-    top.config(menu=menubar)
     menu6 = Menu(menubar, tearoff=False)
     menu6.add_command(label='命令行', command=lambda: MyThread(pydoc1))
     menu6.add_command(label='所有第三方包的网页版', command=lambda: MyThread(pydoc3))
@@ -710,12 +690,6 @@ try:
     menu9.add_command(label='显示目录结构', command=lambda: MyThread(TREE))
     menubar.add_cascade(label='显示目录', menu=menu9)
     top.config(menu=menubar)
-    menu10 = Menu(menubar, tearoff=False)
-    menu10.add_command(label='检查python程序规范', command=lambda: MyThread(pcs))
-    menu10.add_command(label='把python代码修改成规范的样子',
-                       command=lambda: MyThread(yapfyapf))
-    menubar.add_cascade(label='python代码规范', menu=menu10)
-    top.config(menu=menubar)
     menu11 = Menu(menubar, tearoff=False)
     menu11.add_command(label='生成测试文件并运行',
                        command=lambda: MyThread(coverage_run))
@@ -732,13 +706,6 @@ try:
     menu12.add_command(label='diff', command=lambda: MyThread(git_diff))
     menubar.add_cascade(label='git', menu=menu12)
     top.config(menu=menubar)
-    menu13 = Menu(menubar, tearoff=False)
-    menu13.add_command(label='安装', command=lambda: MyThread(pyenv_install))
-    menu13.add_command(label='卸载', command=lambda: MyThread(pyenv_uninstall))
-    menu13.add_command(label='更新', command=lambda: MyThread(pyenv_update))
-    menu13.add_command(label='能安装的目录', command=lambda: MyThread(pyenv_list))
-    menubar.add_cascade(label='pyenv', menu=menu13)
-    top.config(menu=menubar)
     Button(text='再启动一个窗口', command=lambda: MyThread(start)).pack(side=RIGHT)
     Button(text='浏览器', command=lambda: MyThread(liulanqi)).pack(side=RIGHT)
     Button(text='计算器', command=lambda: MyThread(calc)).pack(side=RIGHT)
@@ -746,6 +713,7 @@ try:
            command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
     Button(text='有道翻译器',
            command=lambda: MyThread(youdao_translate)).pack(side=RIGHT)
+    Button(text="yapf格式化", command=lambda: MyThread(yapfyapf)).pack(side=RIGHT)
     Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
     Button(text='颜色表',
            command=lambda: MyThread(import_colors)).pack(side=RIGHT)
