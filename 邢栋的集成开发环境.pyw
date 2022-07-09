@@ -3,6 +3,7 @@ try:
     from tkinter import messagebox
     from tkinter.scrolledtext import ScrolledText
     from os import system, popen
+    from subprocess import run
     from os.path import abspath
     import string
     from keyword import kwlist
@@ -140,33 +141,36 @@ try:
         removedir("__pycache__")
 
     def pip_install():
-        top.title("用pip安装" + message.get())
-        system("pip install " + message.get() + " --no-cache-dir & pause")
+        top.title("正在用pip安装" + message.get())
+        run(["pip", "install", message.get()], shell=True)
+        messagebox.showinfo("安装完成", "安装完成")
+        top.title("")
 
     def pip_upgrade():
-        top.title("用pip升级" + message.get())
-        system("pip install --upgrade " + message.get() +
-               " --no-cache-dir & pause")
+        top.title("正在用pip升级" + message.get())
+        run(["pip", "install", "--upgrade", message.get()], shell=True)
+        messagebox.showinfo("更新完成", "更新完成")
+        top.title("")
 
     def pip_uninstall():
-        top.title("用pip卸载" + message.get())
-        system("pip uninstall " + message.get() + " --no-cache-dir & pause")
+        top.title("正在用pip卸载" + message.get())
+        run(["pip", "uninstall", message.get()], shell=True)
+        messagebox.showinfo("卸载完成", "卸载完成")
+        top.title("")
 
     def pip_install_uninstall():
-        system("pip uninstall " + message.get() + " -y & pip install " +
-               message.get() + " --no-cache-dir & pause")
-        top.title("用pip重新安装" + message.get())
+        top.title("正在用pip重新安装" + message.get())
+        run(["pip", "uninstall", message.get(), "-y"], shell=True)
+        run(["pip", "install", message.get()], shell=True)
+        messagebox.showinfo("重新安装完成", "重新安装完成")
+        top.title("")
 
     def show_all_packages():
-        system(
-            "pip list & --no-cache-dir & echo ------------------------------------------ & pause"
-        )
+        system("pip list & pause")
         top.title("显示安装的所有第三方包")
 
     def show_upgrade_all_packages():
-        system(
-            "pip list -o & --no-cache-dir & echo ------------------------------------------ & pause"
-        )
+        system("pip list --outdated & pause")
         top.title("显示能够更新的所有第三方包")
 
     def upgrade_all_packages():
@@ -190,12 +194,10 @@ try:
         top.title(message.get())
 
     def pip_download():
-        system("pip download " + message.get() + " --no-cache-dir & pause")
-        top.title("用pip下载" + message.get())
-
-    def start():
-        with popen(f"python {abspath(__file__)}") as _:
-            print(_.read())
+        top.title("正在用pip下载" + message.get())
+        run(["pip", "download", message.get()], shell=True)
+        messagebox.showinfo("下载完成", "下载完成")
+        top.title("")
 
     def python_run():
         global opened_file_path
@@ -208,11 +210,6 @@ try:
         system("gcc -O3 " + opened_file_path +
                "& echo ------------------ & pause")
         top.title("编译优化" + opened_file_path)
-
-    def run():
-        global opened_file_path
-        system(opened_file_path)
-        top.title("运行" + opened_file_path)
 
     def java_compile():
         global opened_file_path
@@ -524,7 +521,7 @@ try:
             super().__init__()
             self.func = func
             self.args = args
-            self.setDaemon(True)
+            self.daemon = True
             self.start()
 
         def run(self):
@@ -567,6 +564,7 @@ try:
             process_key(event)
         else:
             process_key(event)
+
     bifs = dir(__builtins__)
     kws = kwlist
     top = Tk()
@@ -578,9 +576,9 @@ try:
     contents.pack(side=BOTTOM, expand=True, fill=BOTH)
     top.protocol("WM_DELETE_WINDOW", on_closing)
     contents.bind('<KeyRelease>', on_key_release)
-    contents.bind('<Control-o>', lambda event:load())
-    contents.bind('<Control-S>', lambda event:resave())#Ctrl+Shift+s
-    contents.bind('<Control-N>', lambda event:start())#Ctrl+Shift+n
+    contents.bind('<Control-o>', lambda event: load())
+    contents.bind('<Control-S>', lambda event: resave())  #Ctrl+Shift+s
+    contents.bind('<Control-N>', lambda event: start())  #Ctrl+Shift+n
     contents.tag_config('bif', foreground='tomato')
     contents.tag_config('kw', foreground='deepskyblue')
     contents.tag_config('comment', foreground='purple')
@@ -634,13 +632,12 @@ try:
     menu3.add_command(label='运行python程序后运行交互式python',
                       command=lambda: MyThread(pythoni))
     menu3.add_command(label='把python程序编译成命令行的exe',
-                    command=lambda: MyThread(pyinstaller_exe_c))
+                      command=lambda: MyThread(pyinstaller_exe_c))
     menu3.add_command(label='把python程序编译成可视化的exe',
                       command=lambda: MyThread(pyinstaller_exe_w))
     menu3.add_command(label='编译c程序', command=lambda: MyThread(c_compile))
     menu3.add_command(label='预处理c程序', command=lambda: MyThread(c_i))
     menu3.add_command(label='编译c程序成汇编语言', command=lambda: MyThread(c_s_intel))
-    menu3.add_command(label='运行.exe或.bat程序', command=lambda: MyThread(run))
     menu3.add_command(label='编译运行c程序', command=lambda: MyThread(c_compile_run))
     menu3.add_command(label='运行go程序', command=lambda: MyThread(go_run))
     menu3.add_command(label='把go程序编译成exe文件',
@@ -706,7 +703,10 @@ try:
     menu12.add_command(label='diff', command=lambda: MyThread(git_diff))
     menubar.add_cascade(label='git', menu=menu12)
     top.config(menu=menubar)
-    Button(text='再启动一个窗口', command=lambda: MyThread(start)).pack(side=RIGHT)
+    Button(
+        text='再启动一个窗口',
+        command=lambda: MyThread(run(["python", abspath(__file__)], shell=True)
+                                 )).pack(side=RIGHT)
     Button(text='浏览器', command=lambda: MyThread(liulanqi)).pack(side=RIGHT)
     Button(text='计算器', command=lambda: MyThread(calc)).pack(side=RIGHT)
     Button(text='死亡之ping',
