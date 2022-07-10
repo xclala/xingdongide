@@ -30,7 +30,7 @@ try:
             argtype = ctypes.c_uint64
 
         prototype = ctypes.WINFUNCTYPE(argtype, argtype, argtype, argtype,
-                                       argtype)
+                                        argtype)
         WM_DROPFILES = 0x233
         GWL_WNDPROC = -4
         create_buffer = ctypes.create_unicode_buffer if force_unicode else ctypes.c_buffer
@@ -44,7 +44,7 @@ try:
                 files = []
                 for i in range(count):
                     func_DragQueryFile(argtype(wp), i, szFile,
-                                       ctypes.sizeof(szFile))
+                                        ctypes.sizeof(szFile))
                     dropname = szFile.value
                     files.append(dropname)
                 func(files)
@@ -80,8 +80,8 @@ try:
             'Batch File(*.bat *.cmd) |*.bat;*.cmd|'\
             '|'
         d = CreateFileDialog(1, None, None,
-                             OFN_OVERWRITEPROMPT | OFN_FILEMUSTEXIST,
-                             file_open_type)
+                                OFN_OVERWRITEPROMPT | OFN_FILEMUSTEXIST,
+                                file_open_type)
         d.SetOFNInitialDir('C:/')
         d.DoModal()
         global opened_file_path
@@ -120,8 +120,8 @@ try:
             'Batch File(*.bat) |*.bat|'\
             '|'
         dd = CreateFileDialog(0, None, None,
-                              OFN_OVERWRITEPROMPT | OFN_FILEMUSTEXIST,
-                              file_save_type)
+                                OFN_OVERWRITEPROMPT | OFN_FILEMUSTEXIST,
+                                file_save_type)
         dd.SetOFNInitialDir('C:/')
         dd.DoModal()
         with open(dd.GetPathName(), 'w', encoding='utf-8') as file:
@@ -202,36 +202,40 @@ try:
     def python_run():
         global opened_file_path
         system("python " + opened_file_path +
-               "& echo ------------------ & pause")
+                "& echo ------------------ & pause")
         top.title("用python运行" + opened_file_path)
 
     def c_compile():
         global opened_file_path
         system("gcc -O3 " + opened_file_path +
-               "& echo ------------------ & pause")
+                "& echo ------------------ & pause")
         top.title("编译优化" + opened_file_path)
 
     def java_compile():
         global opened_file_path
         system("javac " + opened_file_path +
-               "& echo ------------------ & pause")
+                "& echo ------------------ & pause")
         top.title("java编译" + opened_file_path)
 
     def java_run():
         global opened_file_path
         system("java " + opened_file_path +
-               "& echo ------------------ & pause")
+                "& echo ------------------ & pause")
         top.title("java运行" + opened_file_path)
 
     def pyinstaller_exe_c():
         global opened_file_path
-        system("pyinstaller -F " + opened_file_path + "& pause")
-        top.title("用pyinstaller打包命令行" + opened_file_path)
+        top.title("正在用pyinstaller打包命令行" + opened_file_path)
+        run(["pyinstaller", "-F", opened_file_path], shell=True)
+        top.title("")
+        messagebox.showinfo("打包完成", "打包完成")
 
     def pyinstaller_exe_w():
         global opened_file_path
-        system("pyinstaller -F -w " + opened_file_path + "& pause")
-        top.title("用pyinstaller打包可视化" + opened_file_path)
+        top.title("正在用pyinstaller打包可视化" + opened_file_path)
+        run(["pyinstaller", "-F", "-w", opened_file_path], shell=True)
+        top.title("")
+        messagebox.showinfo("打包完成", "打包完成")
 
     def liulanqi():
         import wx
@@ -248,13 +252,11 @@ try:
         frm.Show()
         app.MainLoop()
 
-    def calc():
-        with popen("calc") as _:
-            print(_.read())
-
     def vtenv():
-        system("python -m venv " + message.get())
-        top.title("python用venv创建虚拟环境" + message.get())
+        top.title("正在用venv创建虚拟环境" + message.get())
+        run(["python", "-m", "venv", message.get()], shell=True)
+        top.title("")
+        messagebox.showinfo("成功用venv创建虚拟环境", "成功用venv创建虚拟环境")
 
     def hack_ping():
         system("ping -l 65500 " + message.get() + " -t & pause")
@@ -263,7 +265,7 @@ try:
     def ipython_run():
         global opened_file_path
         system("ipython " + opened_file_path +
-               "& echo ------------------ & pause")
+                "& echo ------------------ & pause")
         top.title("用ipython运行" + opened_file_path)
 
     def c_compile_run():
@@ -274,7 +276,7 @@ try:
     def java_compile_run():
         global opened_file_path
         system("javac " + opened_file_path + "& java " + opened_file_path +
-               ".class" + "& pause")
+                ".class" + "& pause")
         top.title("编译运行java程序" + opened_file_path)
 
     def c_i():
@@ -297,8 +299,8 @@ try:
         global open_file_path
         top.title("删除" + open_file_path)
         shell.SHFileOperation((0, shellcon.FO_DELETE, open_file_path, None,
-                               shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
-                               | shellcon.FOF_NOCONFIRMATION, None, None))
+                                shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
+                                | shellcon.FOF_NOCONFIRMATION, None, None))
 
     def import_colors():
         with popen("python colors.pyw") as _:
@@ -336,19 +338,8 @@ try:
         top.title("运行python程序后运行交互式python")
         system("python -i " + message.get())
 
-    def hide():
-        with popen("attrib +H " + message.get()) as _:
-            print(_.read())
-
-    def unhide():
-        with popen("attrib -H " + message.get()) as _:
-            print(_.read())
-
-    def serv():
-        system("server")
-
     def speed():
-        system("py -m cProfile " + message.get() + "& pause")
+        system("python -m cProfile " + message.get() + "& pause")
 
     def dirdir():
         with popen("python dirr.pyw") as _:
@@ -360,16 +351,6 @@ try:
 
     def requirement_install():
         system("pip install -r requirement.txt & pause")
-
-    def read_only():
-        global opened_file_path
-        top.title("只读" + opened_file_path)
-        system("attrib +R " + opened_file_path)
-
-    def not_read_only():
-        global opened_file_path
-        top.title("解除只读文件" + opened_file_path)
-        system("attrib -R " + opened_file_path)
 
     def python_version():
         from platform import python_version
@@ -433,7 +414,7 @@ try:
                                 f'{current_line_num}.{current_col_num}')
         else:
             lines = contents.get('0.0',
-                                 END).rstrip('\n').splitlines(keepends=True)
+                                    END).rstrip('\n').splitlines(keepends=True)
             contents.delete('0.0', END)
             for line in lines:
                 flag1, flag2, flag3 = False, False, False
@@ -477,7 +458,7 @@ try:
                     else:
                         contents.insert(INSERT, word)
             contents.mark_set('insert',
-                              f'{current_line_num}.{current_col_num}')
+                                f'{current_line_num}.{current_col_num}')
 
     def other_theme():
         contents.bind('<KeyRelease>', process_key)
@@ -524,7 +505,7 @@ try:
             self.daemon = True
             self.start()
 
-        def run(self):
+        def Run(self):
             self.func(*self.args)
 
     def git_init():
@@ -578,7 +559,7 @@ try:
     contents.bind('<KeyRelease>', on_key_release)
     contents.bind('<Control-o>', lambda event: load())
     contents.bind('<Control-S>', lambda event: resave())  #Ctrl+Shift+s
-    contents.bind('<Control-N>', lambda event: start())  #Ctrl+Shift+n
+    contents.bind('<Control-N>', lambda event: run(["python", abspath(__file__)], shell=True))  #Ctrl+Shift+n
     contents.tag_config('bif', foreground='tomato')
     contents.tag_config('kw', foreground='deepskyblue')
     contents.tag_config('comment', foreground='purple')
@@ -590,10 +571,18 @@ try:
     menu1.add_command(label='打开文件', command=lambda: MyThread(load))
     menu1.add_command(label='保存文件', command=lambda: MyThread(save))
     menu1.add_command(label='另存为文件', command=lambda: MyThread(resave))
-    menu1.add_command(label='隐藏文件', command=hide)
-    menu1.add_command(label='恢复隐藏的文件', command=unhide)
-    menu1.add_command(label='只读文件', command=read_only)
-    menu1.add_command(label='解除只读文件', command=not_read_only)
+    menu1.add_command(label='隐藏文件',
+                        command=run(["attrib", "+H",
+                                    message.get()]))
+    menu1.add_command(label='恢复隐藏的文件',
+                        command=run(["attrib", "-H",
+                                    message.get()]))
+    menu1.add_command(label='只读文件',
+                        command=run(["attrib", "+R",
+                                    message.get()]))
+    menu1.add_command(label='解除只读文件',
+                        command=run(["attrib", "-R",
+                                    message.get()]))
     menu1.add_command(label='显示字节数', command=alert_file_byte)
     menu1.add_command(label='创建文件夹', command=md)
     menu1.add_command(label='删除文件夹', command=rd)
@@ -604,23 +593,23 @@ try:
     top.config(menu=menubar)
     menu2 = Menu(menubar, tearoff=False)
     menu2.add_command(label='提供可选项更新第三方包',
-                      command=lambda: MyThread(upgrade_packages))
+                        command=lambda: MyThread(upgrade_packages))
     menu2.add_command(label='更新所有第三方包',
-                      command=lambda: MyThread(upgrade_all_packages))
+                        command=lambda: MyThread(upgrade_all_packages))
     menu2.add_command(label='显示能够更新的所有第三方包',
-                      command=lambda: MyThread(show_upgrade_all_packages))
+                        command=lambda: MyThread(show_upgrade_all_packages))
     menu2.add_command(label='显示安装的所有第三方包',
-                      command=lambda: MyThread(show_all_packages))
+                        command=lambda: MyThread(show_all_packages))
     menu2.add_command(label='pip帮助', command=lambda: MyThread(pip_help))
     menu2.add_command(label='检查依赖', command=lambda: MyThread(pip_check))
     menu2.add_command(label='搜索', command=lambda: MyThread(pip_search))
     menu2.add_command(label='查看信息', command=lambda: MyThread(pip_show))
     menu2.add_command(label='用requirement.txt中的包安装',
-                      command=lambda: MyThread(requirement_install))
+                        command=lambda: MyThread(requirement_install))
     menu2.add_command(label='下载安装包', command=lambda: MyThread(pip_download))
     menu2.add_command(label='卸载', command=lambda: MyThread(pip_uninstall))
     menu2.add_command(label='重新安装',
-                      command=lambda: MyThread(pip_install_uninstall))
+                        command=lambda: MyThread(pip_install_uninstall))
     menu2.add_command(label='升级', command=lambda: MyThread(pip_upgrade))
     menu2.add_command(label='安装', command=lambda: MyThread(pip_install))
     menubar.add_cascade(label="python第三方包管理器", menu=menu2)
@@ -628,40 +617,40 @@ try:
     menu3 = Menu(menubar, tearoff=False)
     menu3.add_command(label='运行python程序', command=lambda: MyThread(python_run))
     menu3.add_command(label='用ipython运行python程序',
-                      command=lambda: MyThread(ipython_run))
+                        command=lambda: MyThread(ipython_run))
     menu3.add_command(label='运行python程序后运行交互式python',
-                      command=lambda: MyThread(pythoni))
+                        command=lambda: MyThread(pythoni))
     menu3.add_command(label='把python程序编译成命令行的exe',
-                      command=lambda: MyThread(pyinstaller_exe_c))
+                        command=lambda: MyThread(pyinstaller_exe_c))
     menu3.add_command(label='把python程序编译成可视化的exe',
-                      command=lambda: MyThread(pyinstaller_exe_w))
+                        command=lambda: MyThread(pyinstaller_exe_w))
     menu3.add_command(label='编译c程序', command=lambda: MyThread(c_compile))
     menu3.add_command(label='预处理c程序', command=lambda: MyThread(c_i))
     menu3.add_command(label='编译c程序成汇编语言', command=lambda: MyThread(c_s_intel))
     menu3.add_command(label='编译运行c程序', command=lambda: MyThread(c_compile_run))
     menu3.add_command(label='运行go程序', command=lambda: MyThread(go_run))
     menu3.add_command(label='把go程序编译成exe文件',
-                      command=lambda: MyThread(go_build))
+                        command=lambda: MyThread(go_build))
     menu3.add_command(label='编译java程序', command=lambda: MyThread(java_compile))
     menu3.add_command(label='运行java程序', command=lambda: MyThread(java_run))
     menu3.add_command(label='编译运行java程序',
-                      command=lambda: MyThread(java_compile_run))
+                        command=lambda: MyThread(java_compile_run))
     menubar.add_cascade(label="编译与运行", menu=menu3)
     top.config(menu=menubar)
     menu4 = Menu(menubar, tearoff=False)
     menu4.add_command(label='dos', command=lambda: MyThread(system("cmd")))
     menu4.add_command(label='python',
-                      command=lambda: MyThread(system("python")))
+                        command=lambda: MyThread(system("python")))
     menu4.add_command(label='ipython',
-                      command=lambda: MyThread(system("ipython")))
+                        command=lambda: MyThread(system("ipython")))
     menu4.add_command(label='ptpython',
-                      command=lambda: MyThread(system("ptpython")))
+                        command=lambda: MyThread(system("ptpython")))
     menu4.add_command(label='ptipython',
-                      command=lambda: MyThread(system("ptipython")))
+                        command=lambda: MyThread(system("ptipython")))
     menu4.add_command(label='bpython',
-                      command=lambda: MyThread(system("bpython")))
+                        command=lambda: MyThread(system("bpython")))
     menu4.add_command(label='powershell',
-                      command=lambda: MyThread(system("powershell")))
+                        command=lambda: MyThread(system("powershell")))
     menubar.add_cascade(label="命令行", menu=menu4)
     top.config(menu=menubar)
     menu6 = Menu(menubar, tearoff=False)
@@ -689,10 +678,10 @@ try:
     top.config(menu=menubar)
     menu11 = Menu(menubar, tearoff=False)
     menu11.add_command(label='生成测试文件并运行',
-                       command=lambda: MyThread(coverage_run))
+                        command=lambda: MyThread(coverage_run))
     menu11.add_command(label='显示结果', command=lambda: MyThread(coverage_report))
     menu11.add_command(label='生成html文件夹',
-                       command=lambda: MyThread(coverage_html))
+                        command=lambda: MyThread(coverage_html))
     menubar.add_cascade(label='python测试覆盖率', menu=menu11)
     top.config(menu=menubar)
     menu12 = Menu(menubar, tearoff=False)
@@ -706,25 +695,25 @@ try:
     Button(
         text='再启动一个窗口',
         command=lambda: MyThread(run(["python", abspath(__file__)], shell=True)
-                                 )).pack(side=RIGHT)
+                                    )).pack(side=RIGHT)
     Button(text='浏览器', command=lambda: MyThread(liulanqi)).pack(side=RIGHT)
-    Button(text='计算器', command=lambda: MyThread(calc)).pack(side=RIGHT)
+    Button(text='计算器',
+            command=lambda: MyThread(run("calc", shell=True))).pack(side=RIGHT)
     Button(text='死亡之ping',
-           command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
+            command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
     Button(text='有道翻译器',
-           command=lambda: MyThread(youdao_translate)).pack(side=RIGHT)
+            command=lambda: MyThread(youdao_translate)).pack(side=RIGHT)
     Button(text="yapf格式化", command=lambda: MyThread(yapfyapf)).pack(side=RIGHT)
     Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
     Button(text='颜色表',
-           command=lambda: MyThread(import_colors)).pack(side=RIGHT)
+            command=lambda: MyThread(import_colors)).pack(side=RIGHT)
     Button(text='修改标题', command=tit)
-    Button(text='启动80端口服务器', command=lambda: MyThread(serv)).pack(side=RIGHT)
     Button(text='类型检查', command=lambda: MyThread(mypy_type)).pack(side=RIGHT)
     Button(text='百度', command=lambda: MyThread(baidu)).pack(side=RIGHT)
     Button(text='python官网',
-           command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
+            command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
     Button(text='python版本',
-           command=lambda: MyThread(python_version)).pack(side=LEFT)
+            command=lambda: MyThread(python_version)).pack(side=LEFT)
     mainloop()
 except Exception as e:
     print(e)
