@@ -1,0 +1,14 @@
+ipython
+setuptools
+ptpython
+bpython
+pip
+pyinstaller
+requests
+coverage
+pycodestyle
+pip-review
+yapf
+pylint
+pyenv
+pypiwin32

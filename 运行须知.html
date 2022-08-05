@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>依赖</title>
+    <meta name="author" content="邢栋">
+</head>
+
+<body>
+    <style>
+        @media(prefers-color-scheme:dark) {
+
+            h1,
+            strong {
+                color: white;
+            }
+
+            body {
+                background-color: #111114;
+            }
+        }
+
+        @media(prefers-color-scheme:light) {
+
+            h1,
+            strong {
+                color: black;
+            }
+
+            body {
+                background-color: whitesmoke;
+            }
+
+        }
+
+        h1 {
+            text-align: center;
+        }
+    </style>
+    <h1>依赖</h1>
+    <strong>1.本程序需在64位的windows10或64位的windows11中运行<br></strong>
+    <strong>2.本程序需在python>=3.8中运行<br></strong>
+    <strong>3.pip install -r requirements.txt<br></strong>
+    <strong>4.本程序需在有gcc,JDK,golang,git的环境中运行<br></strong>
+    <script>
+        window.onload = function () {
+            const BACKGROUNDCOLOR = ['black', 'white']
+            const TEXTCOLOR = ['white', 'black']
+            let c = 0
+            document.getElementsByTagName("h1")[0].onclick = function () {
+                document.body.style.backgroundColor = BACKGROUNDCOLOR[c % 2]
+                document.getElementsByTagName("h1")[0].style.color = TEXTCOLOR[c % 2]
+                for (i = 0; i < 4; i++) {
+                    document.getElementsByTagName("strong")[i].style.color = TEXTCOLOR[c % 2]
+                }
+                c++
+            }
+        }
+    </script>
+</body>
+
+</html>
