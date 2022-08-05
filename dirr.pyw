@@ -1,9 +1,9 @@
 from tkinter import *
-from os import popen
+from subprocess import run, PIPE
 
 root = Tk()
 root.title("显示目录下的文件")
 root.geometry("1000x700")
-with popen("dir /a /q", "r") as p:
-    Label(text=p.read()).pack(side=TOP)
+_ = run(["dir", "/a", "/q"], shell=True, stdout=PIPE)
+Label(text=_.stdout.decode("gb2312")).pack(side=TOP)
 mainloop()

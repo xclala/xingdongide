@@ -143,6 +143,7 @@ colors = '''#FFB6C1 LightPink 浅粉红
 root = Tk()
 root.title("颜色")
 root.geometry('970x900')
+root.resizable(0, 0)
 i = 0
 colcut = 4
 for color in colors.split('\n'):
