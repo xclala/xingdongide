@@ -6,7 +6,7 @@ try:
     from os import system, popen
     from subprocess import run
     from os.path import abspath
-    import string
+    from string import ascii_letters
     from keyword import kwlist
     from threading import Thread
     opened_file_path = ""
@@ -377,7 +377,7 @@ try:
                     elif flag2 or flag3:
                         contents.insert(INSERT, ch, 'string')
                     else:
-                        if ch not in string.ascii_letters:
+                        if ch not in ascii_letters:
                             if flag1:
                                 flag1 = False
                                 word = line[start:index]
