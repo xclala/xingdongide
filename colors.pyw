@@ -68,9 +68,10 @@ root.geometry('970x900')
 root.resizable(0, 0)
 i = 0
 colcut = 4
-sp = color.split(' ')
-Label(root, text=color, bg=sp[1]).grid(row=int(i / colcut),
-                                        column=i % colcut,
-                                        sticky=W + E + N + S)
-i += 1
+for color in colors:
+    sp = color.split(' ')
+    Label(root, text=color, bg=sp[1]).grid(row=int(i / colcut),
+                                            column=i % colcut,
+                                            sticky=W + E + N + S)
+    i += 1
 root.mainloop()
