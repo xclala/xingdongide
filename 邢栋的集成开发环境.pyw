@@ -4,7 +4,7 @@ try:
     from tkinter.scrolledtext import ScrolledText
     from tkinter.filedialog import askopenfilename, asksaveasfilename
     from os import system, popen
-    from subprocess import run
+    from subprocess import run, PIPE
     from os.path import abspath
     from string import ascii_letters
     from keyword import kwlist
@@ -295,8 +295,12 @@ try:
         system("python -m cProfile " + message.get() + "& pause")
 
     def dirdir():
-        with popen("python dirr.pyw") as _:
-            print(_.read())
+        root = Tk()
+        root.title("显示目录下的文件")
+        root.geometry("1000x700")
+        _ = run(["dir", "/a", "/q"], shell=True, stdout=PIPE)
+        Label(root, text=_.stdout.decode("gb2312")).pack(side=TOP)
+        mainloop()
 
     def yapfyapf():
         global opened_file_path
