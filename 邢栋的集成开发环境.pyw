@@ -264,11 +264,6 @@ try:
             print(_.read())
         top.title("颜色表")
 
-    def youdao_translate():
-        with popen("python youdao_translate.pyw") as _:
-            print(_.read())
-        top.title("有道翻译器")
-
     def pydoc1():
         top.title("python第三方包文档")
         system("python -m pydoc " + message.get() + "& pause")
@@ -645,8 +640,6 @@ try:
             command=lambda: MyThread(run("calc", shell=True))).pack(side=RIGHT)
     Button(text='死亡之ping',
             command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
-    Button(text='有道翻译器',
-            command=lambda: MyThread(youdao_translate)).pack(side=RIGHT)
     Button(text="yapf格式化", command=lambda: MyThread(yapfyapf)).pack(side=RIGHT)
     Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
     Button(text='颜色表',
