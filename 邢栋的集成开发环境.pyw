@@ -110,13 +110,16 @@ try:
 
     def pip_install():
         top.title(f"正在用pip安装{message.get()}")
-        run_cmd([executable, "-m", "pip", "install", message.get()], shell=True)
+        run_cmd([executable, "-m", "pip", "install",
+                 message.get()],
+                shell=True)
         messagebox.showinfo("安装完成", "安装完成")
         top.title("")
 
     def pip_upgrade():
         top.title(f"正在用pip升级{message.get()}")
-        run_cmd([executable, "-m", "pip", "install", "--upgrade",
+        run_cmd(
+            [executable, "-m", "pip", "install", "--upgrade",
              message.get()],
             shell=True)
         messagebox.showinfo("更新完成", "更新完成")
@@ -124,16 +127,20 @@ try:
 
     def pip_uninstall():
         top.title(f"正在用pip卸载{message.get()}")
-        run_cmd([executable, "-m", "pip", "uninstall", message.get()], shell=True)
+        run_cmd([executable, "-m", "pip", "uninstall",
+                 message.get()],
+                shell=True)
         messagebox.showinfo("卸载完成", "卸载完成")
         top.title("")
 
     def pip_install_uninstall():
         top.title(f"正在用pip重新安装{message.get()}")
         run_cmd([executable, "-m", "pip", "uninstall",
-             message.get(), "-y"],
-            shell=True)
-        run_cmd([executable, "-m", "pip", "install", message.get()], shell=True)
+                 message.get(), "-y"],
+                shell=True)
+        run_cmd([executable, "-m", "pip", "install",
+                 message.get()],
+                shell=True)
         messagebox.showinfo("重新安装完成", "重新安装完成")
         top.title("")
 
@@ -159,31 +166,33 @@ try:
 
     def pip_download():
         top.title(f"正在用pip下载{message.get()}")
-        run_cmd([executable, "-m", "pip", "download", message.get()], shell=True)
+        run_cmd([executable, "-m", "pip", "download",
+                 message.get()],
+                shell=True)
         messagebox.showinfo("下载完成", "下载完成")
         top.title("")
 
-    def python_run_cmd():
+    def python_run():
         global opened_file_path
-        call(f"{executable} {opened_file_path} & echo ------------------ & pause")
+        call(
+            f"{executable} {opened_file_path} & echo ------------------ & pause"
+        )
         top.title("用python运行" + opened_file_path)
 
     def c_compile():
         global opened_file_path
         call("gcc -O3 " + opened_file_path +
-               "& echo ------------------ & pause")
+             "& echo ------------------ & pause")
         top.title("编译优化" + opened_file_path)
 
     def java_compile():
         global opened_file_path
-        call("javac " + opened_file_path +
-               "& echo ------------------ & pause")
+        call("javac " + opened_file_path + "& echo ------------------ & pause")
         top.title("java编译" + opened_file_path)
 
-    def java_run_cmd():
+    def java_run():
         global opened_file_path
-        call("java " + opened_file_path +
-               "& echo ------------------ & pause")
+        call("java " + opened_file_path + "& echo ------------------ & pause")
         top.title("java运行" + opened_file_path)
 
     def pyinstaller_exe_c():
@@ -213,21 +222,21 @@ try:
         call("ping -l 65500 " + message.get() + " -t & pause")
         top.title("目标IP:" + message.get())
 
-    def ipython_run_cmd():
+    def ipython_run():
         global opened_file_path
         call("ipython " + opened_file_path +
-               "& echo ------------------ & pause")
+             "& echo ------------------ & pause")
         top.title("用ipython运行" + opened_file_path)
 
-    def c_compile_run_cmd():
+    def c_compile_run():
         global opened_file_path
         call("gcc -O3 " + opened_file_path + "-o a.exe & a & pause")
         top.title("编译运行c程序" + opened_file_path)
 
-    def java_compile_run_cmd():
+    def java_compile_run():
         global opened_file_path
         call("javac " + opened_file_path + "& java " + opened_file_path +
-               ".class" + "& pause")
+             ".class" + "& pause")
         top.title("编译运行java程序" + opened_file_path)
 
     def c_i():
@@ -312,7 +321,7 @@ try:
     def requirement_install():
         top.title("正在安装requirements.txt")
         run_cmd([executable, "-m", "pip", "install", "-r", "requirements.txt"],
-            shell=True)
+                shell=True)
         top.title("安装完成")
 
     def python_ver():
@@ -327,14 +336,14 @@ try:
         messagebox.showinfo("约" + str(getsize(opened_file_path)) + "字节",
                             "约" + str(getsize(opened_file_path)) + "字节")
 
-    def coverage_run_cmd():
-        call("coverage run " + message.get() + "& pause")
+    def coverage_run():
+        call(f"coverage run {message.get()} & pause")
 
     def coverage_report():
-        call("coverage report -m " + message.get() + "& pause")
+        call(f"coverage report -m {message.get()} & pause")
 
     def coverage_html():
-        call("coverage html -d report" + "& pause")
+        call("coverage html -d report & pause")
 
     def on_closing():
         if contents.get('1.0', END).strip():
@@ -444,15 +453,16 @@ try:
         contents.tag_config('comment', foreground='gray')
         contents.tag_config('string', foreground='green')
 
-    def go_run_cmd():
-        call("go run " + message.get())
+    def go_run():
+        call(f"go run {message.get()}")
         top.title("运行go程序")
 
     def go_build():
-        call("go build " + message.get())
+        call(f"go build {message.get()}")
         top.title("把go程序编译成exe文件")
 
     class MyThread(Thread):
+
         def __init__(self, func, *args):
             super().__init__()
             self.func = func
@@ -517,8 +527,9 @@ try:
     contents.bind('<KeyRelease>', on_key_release)
     contents.bind('<Control-o>', lambda event: load())
     contents.bind('<Control-S>', lambda event: resave())  #Ctrl+Shift+s
-    contents.bind('<Control-N>', lambda event: run_cmd(
-        ["python", abspath(__file__)], shell=True))  #Ctrl+Shift+n
+    contents.bind('<Control-N>',
+                  lambda event: run_cmd(["python", abspath(__file__)],
+                                        shell=True))  #Ctrl+Shift+n
     contents.tag_config('bif', foreground='tomato')
     contents.tag_config('kw', foreground='deepskyblue')
     contents.tag_config('comment', foreground='purple')
@@ -540,7 +551,8 @@ try:
                       command=run_cmd(
                           ["attrib", "+R", message.get()], shell=True))
     menu1.add_command(label='解除只读文件',
-                      command=run_cmd(["attrib", "-R", message.get()], shell=True))
+                      command=run_cmd(
+                          ["attrib", "-R", message.get()], shell=True))
     menu1.add_command(label='显示字节数', command=alert_file_byte)
     menu1.add_command(label='创建文件夹', command=md)
     menu1.add_command(label='删除文件夹', command=rd)
@@ -631,8 +643,10 @@ try:
     top.config(menu=menubar)
     Button(
         text='再启动一个窗口',
-        command=lambda: MyThread(run_cmd, [executable, abspath(__file__)], True)).pack(side=RIGHT)
-    Button(text='计算器', command=lambda: MyThread(run_cmd, "calc", True)).pack(side=RIGHT)
+        command=lambda: MyThread(
+            run_cmd, [executable, abspath(__file__)], True)).pack(side=RIGHT)
+    Button(text='计算器',
+           command=lambda: MyThread(run_cmd, "calc", True)).pack(side=RIGHT)
     Button(text='死亡之ping',
            command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
     Button(text="yapf格式化", command=lambda: MyThread(yapfyapf)).pack(side=RIGHT)
@@ -641,8 +655,10 @@ try:
     Button(text='修改标题', command=tit).pack(side=RIGHT)
     Button(text='类型检查', command=lambda: MyThread(mypy_type)).pack(side=RIGHT)
     Button(text='百度', command=lambda: MyThread(baidu)).pack(side=RIGHT)
-    Button(text='python官网', command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
-    Button(text='python版本', command=lambda: MyThread(python_ver)).pack(side=RIGHT)
+    Button(text='python官网',
+           command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
+    Button(text='python版本',
+           command=lambda: MyThread(python_ver)).pack(side=RIGHT)
     Button(text="显示目录文件", command=dirdir).pack(side=RIGHT)
     mainloop()
 except Exception as e:
