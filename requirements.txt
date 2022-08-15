@@ -4,7 +4,6 @@ ptpython
 bpython
 pip
 pyinstaller
-requests
 coverage
 pycodestyle
 pip-review
