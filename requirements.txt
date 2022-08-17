@@ -5,9 +5,5 @@ bpython
 pip
 pyinstaller
 coverage
-pycodestyle
-pip-review
 yapf
-pylint
-pyenv
 pypiwin32

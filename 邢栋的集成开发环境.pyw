@@ -114,7 +114,7 @@ try:
                  message.get()],
                 shell=True)
         messagebox.showinfo("安装完成", "安装完成")
-        top.title("")
+        top.title("邢栋的集成开发环境")
 
     def pip_upgrade():
         top.title(f"正在用pip升级{message.get()}")
@@ -123,7 +123,7 @@ try:
              message.get()],
             shell=True)
         messagebox.showinfo("更新完成", "更新完成")
-        top.title("")
+        top.title("邢栋的集成开发环境")
 
     def pip_uninstall():
         top.title(f"正在用pip卸载{message.get()}")
@@ -131,7 +131,7 @@ try:
                  message.get()],
                 shell=True)
         messagebox.showinfo("卸载完成", "卸载完成")
-        top.title("")
+        top.title("邢栋的集成开发环境")
 
     def pip_install_uninstall():
         top.title(f"正在用pip重新安装{message.get()}")
@@ -142,15 +142,20 @@ try:
                  message.get()],
                 shell=True)
         messagebox.showinfo("重新安装完成", "重新安装完成")
-        top.title("")
+        top.title("邢栋的集成开发环境")
 
     def upgrade_all_packages():
-        call("pip-review --auto")
-        top.title("更新所有第三方包")
-
-    def upgrade_packages():
-        call("pip-review --local --interactive & pause")
-        top.title("更新第三方包")
+        top.title("正在更新所有第三方包")
+        from json import loads
+        a = run_cmd(
+            [executable, "-m", "pip", "list", "--outdated", "--format=json"],
+            stdout=PIPE,
+            shell=True)
+        for i in loads(a.stdout.decode()):
+            run_cmd([executable, "-m", "pip", "install", "--upgrade", i["name"]],
+                shell=True)
+        messagebox.showinfo("更新完成", "更新完成")
+        top.title("邢栋的集成开发环境")
 
     def pip_show():
         call(f"{executable} show {message.get()} --no-cache-dir & pause")
@@ -170,7 +175,7 @@ try:
                  message.get()],
                 shell=True)
         messagebox.showinfo("下载完成", "下载完成")
-        top.title("")
+        top.title("邢栋的集成开发环境")
 
     def python_run():
         global opened_file_path
@@ -199,14 +204,14 @@ try:
         global opened_file_path
         top.title("正在用pyinstaller打包命令行" + opened_file_path)
         run_cmd(["pyinstaller", "-F", opened_file_path], shell=True)
-        top.title("")
+        top.title("邢栋的集成开发环境")
         messagebox.showinfo("打包完成", "打包完成")
 
     def pyinstaller_exe_w():
         global opened_file_path
         top.title("正在用pyinstaller打包可视化" + opened_file_path)
         run_cmd(["pyinstaller", "-F", "-w", opened_file_path], shell=True)
-        top.title("")
+        top.title("邢栋的集成开发环境")
         messagebox.showinfo("打包完成", "打包完成")
 
     def vtenv():
@@ -215,7 +220,7 @@ try:
         if t == '':
             t = '.'
         run_cmd([executable, "-m", "venv", t], shell=True)
-        top.title("")
+        top.title("邢栋的集成开发环境")
         messagebox.showinfo("成功用venv创建虚拟环境", "成功用venv创建虚拟环境")
 
     def hack_ping():
@@ -348,9 +353,7 @@ try:
     def on_closing():
         if contents.get('1.0', END).strip():
             save()
-            top.destroy()
-        else:
-            top.destroy()
+        top.destroy()
 
     def process_key(key):
         current_line_num, current_col_num = map(
@@ -562,8 +565,6 @@ try:
     menubar.add_cascade(label="文件管理", menu=menu1)
     top.config(menu=menubar)
     menu2 = Menu(menubar, tearoff=False)
-    menu2.add_command(label='提供可选项更新第三方包',
-                      command=lambda: MyThread(upgrade_packages))
     menu2.add_command(label='更新所有第三方包',
                       command=lambda: MyThread(upgrade_all_packages))
     menu2.add_command(label='检查依赖', command=lambda: MyThread(pip_check))
