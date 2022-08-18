@@ -320,8 +320,12 @@ try:
         mainloop()
 
     def yapfyapf():
+        from yapf.yapflib.yapf_api import FormatFile
         global opened_file_path
-        call("yapf -i " + opened_file_path)
+        FormatFile(open_file_path, in_place=True)
+        with open(opened_file_path, encoding='utf-8') as file:
+            contents.delete('1.0', END)
+            contents.insert(INSERT, file.read())
 
     def requirement_install():
         top.title("正在安装requirements.txt")
