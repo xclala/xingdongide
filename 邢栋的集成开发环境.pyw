@@ -86,8 +86,7 @@ try:
             with open(opened_file_path, 'w', encoding='utf-8') as file:
                 file.write(contents.get('1.0', END))
             top.title("已保存" + opened_file_path)
-        else:
-            resave()
+        resave()
 
     def resave():
         global opened_file_path
@@ -333,6 +332,26 @@ try:
                 shell=True)
         top.title("安装完成")
 
+    def Replace():
+        def replace_text():
+            temp = contents.get('1.0', END)
+            contents.delete('1.0', END)
+            contents.insert(INSERT, temp.replace(m.get(), r.get()))
+            save()
+            root.destroy()
+        root = Tk()
+        root.title("替换")
+        root.geometry("200x150")
+        root.resizable(0, 0)
+        Label(root, text="原文字：").pack()
+        m = Entry(root)
+        m.pack()
+        Label(root, text="替换成：").pack()
+        r = Entry(root)
+        r.pack()
+        Button(root, text="确定", command=replace_text).pack(side=BOTTOM)
+        mainloop()
+
     def python_ver():
         from platform import python_version
         messagebox.showinfo("python版本", python_version())
@@ -356,7 +375,8 @@ try:
 
     def on_closing():
         if contents.get('1.0', END).strip():
-            save()
+            if messagebox.askyesno(top, message="你要保存吗？"):
+                save()
         top.destroy()
 
     def process_key(key):
@@ -517,9 +537,7 @@ try:
     def on_key_release(event):
         if opened_file_path:
             save()
-            process_key(event)
-        else:
-            process_key(event)
+        process_key(event)
 
     bifs = dir(__builtins__)
     kws = kwlist
@@ -665,6 +683,7 @@ try:
     Button(text='python版本',
            command=lambda: MyThread(python_ver)).pack(side=RIGHT)
     Button(text="显示目录文件", command=dirdir).pack(side=RIGHT)
+    Button(text="替换", command=Replace).pack(side=RIGHT)
     mainloop()
 except Exception as e:
     print(e)
