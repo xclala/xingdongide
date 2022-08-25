@@ -10,59 +10,61 @@ try:
     from keyword import kwlist
     from threading import Thread
     from sys import executable
+    from os import name as osname
 
     opened_file_path = ""
 
     def hook_dropfiles(tkwindow_or_winfoid, func, force_unicode=False):
-        import ctypes
-        from ctypes.wintypes import DWORD
+        if osname == 'nt':
+            import ctypes
+            from ctypes.wintypes import DWORD
 
-        hwnd = tkwindow_or_winfoid.winfo_id()\
-            if getattr(tkwindow_or_winfoid, "winfo_id", None)\
-            else tkwindow_or_winfoid
+            hwnd = tkwindow_or_winfoid.winfo_id()\
+                if getattr(tkwindow_or_winfoid, "winfo_id", None)\
+                else tkwindow_or_winfoid
 
-        GetWindowLong = ctypes.windll.user32.GetWindowLongPtrA
-        SetWindowLong = ctypes.windll.user32.SetWindowLongPtrA
-        argtype = ctypes.c_uint64
+            GetWindowLong = ctypes.windll.user32.GetWindowLongPtrA
+            SetWindowLong = ctypes.windll.user32.SetWindowLongPtrA
+            argtype = ctypes.c_uint64
 
-        prototype = ctypes.WINFUNCTYPE(argtype, argtype, argtype, argtype,
-                                       argtype)
-        WM_DROPFILES = 0x233
-        GWL_WNDPROC = -4
-        create_buffer = ctypes.create_unicode_buffer if force_unicode else ctypes.c_buffer
-        func_DragQueryFile = ctypes.windll.shell32.DragQueryFileW if force_unicode else ctypes.windll.shell32.DragQueryFile
+            prototype = ctypes.WINFUNCTYPE(argtype, argtype, argtype, argtype,
+                                        argtype)
+            WM_DROPFILES = 0x233
+            GWL_WNDPROC = -4
+            create_buffer = ctypes.create_unicode_buffer if force_unicode else ctypes.c_buffer
+            func_DragQueryFile = ctypes.windll.shell32.DragQueryFileW if force_unicode else ctypes.windll.shell32.DragQueryFile
 
-        def py_drop_func(hwnd, msg, wp, lp):
-            global files
-            if msg == WM_DROPFILES:
-                count = func_DragQueryFile(argtype(wp), -1, None, None)
-                szFile = create_buffer(260)
-                files = []
-                for i in range(count):
-                    func_DragQueryFile(argtype(wp), i, szFile,
-                                       ctypes.sizeof(szFile))
-                    dropname = szFile.value
-                    files.append(dropname)
-                func(files)
-                ctypes.windll.shell32.DragFinish(argtype(wp))
-            return ctypes.windll.user32.CallWindowProcW(
-                *map(argtype, (globals()[old], hwnd, msg, wp, lp)))
+            def py_drop_func(hwnd, msg, wp, lp):
+                global files
+                if msg == WM_DROPFILES:
+                    count = func_DragQueryFile(argtype(wp), -1, None, None)
+                    szFile = create_buffer(260)
+                    files = []
+                    for i in range(count):
+                        func_DragQueryFile(argtype(wp), i, szFile,
+                                        ctypes.sizeof(szFile))
+                        dropname = szFile.value
+                        files.append(dropname)
+                    func(files)
+                    ctypes.windll.shell32.DragFinish(argtype(wp))
+                return ctypes.windll.user32.CallWindowProcW(
+                    *map(argtype, (globals()[old], hwnd, msg, wp, lp)))
 
-        # for limit hook number, protect computer.
-        limit_num = 200
-        for i in range(limit_num):
-            if i + 1 == limit_num:
-                raise "over hook limit number 200, for protect computer."
-            if "old_wndproc_%d" % i not in globals():
-                old, new = "old_wndproc_%d" % i, "new_wndproc_%d" % i
-                break
+            # for limit hook number, protect computer.
+            limit_num = 200
+            for i in range(limit_num):
+                if i + 1 == limit_num:
+                    raise "over hook limit number 200, for protect computer."
+                if "old_wndproc_%d" % i not in globals():
+                    old, new = "old_wndproc_%d" % i, "new_wndproc_%d" % i
+                    break
 
-        globals()[old] = None
-        globals()[new] = prototype(py_drop_func)
+            globals()[old] = None
+            globals()[new] = prototype(py_drop_func)
 
-        ctypes.windll.shell32.DragAcceptFiles(hwnd, True)
-        globals()[old] = GetWindowLong(hwnd, GWL_WNDPROC)
-        SetWindowLong(hwnd, GWL_WNDPROC, globals()[new])
+            ctypes.windll.shell32.DragAcceptFiles(hwnd, True)
+            globals()[old] = GetWindowLong(hwnd, GWL_WNDPROC)
+            SetWindowLong(hwnd, GWL_WNDPROC, globals()[new])
 
     def load():
         global opened_file_path
@@ -223,8 +225,9 @@ try:
         messagebox.showinfo("成功用venv创建虚拟环境", "成功用venv创建虚拟环境")
 
     def hack_ping():
-        call("ping -l 65500 " + message.get() + " -t & pause")
-        top.title("目标IP:" + message.get())
+        if osname == "nt":
+            call("ping -l 65500 " + message.get() + " -t & pause")
+            top.title("目标IP:" + message.get())
 
     def ipython_run():
         global opened_file_path
@@ -260,12 +263,13 @@ try:
         top.title("已永久删除" + open_file_path)
 
     def remv():
-        from win32com.shell import shell, shellcon
-        global open_file_path
-        top.title("删除" + open_file_path)
-        shell.SHFileOperation((0, shellcon.FO_DELETE, open_file_path, None,
-                               shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
-                               | shellcon.FOF_NOCONFIRMATION, None, None))
+        if osname == 'nt':
+            from win32com.shell import shell, shellcon
+            global open_file_path
+            top.title("删除" + open_file_path)
+            shell.SHFileOperation((0, shellcon.FO_DELETE, open_file_path, None,
+                                shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
+                                | shellcon.FOF_NOCONFIRMATION, None, None))
 
     def colours():
         top.title("颜色表")
@@ -287,14 +291,14 @@ try:
 
     def pydoc1():
         top.title("python第三方包文档")
-        call("python -m pydoc " + message.get() + "& pause")
+        call(f"{executable} -m pydoc {message.get()}& pause")
 
     def pydoc3():
         top.title("python第三方包文档")
         if message.get() == '':
-            call("python -m pydoc -p 80 & pause")
+            call(f"{executable} -m pydoc -p 80 & pause")
         else:
-            call("python -m pydoc -p " + message.get() + "& pause")
+            call(f"{executable} -m pydoc -p {message.get()} & pause")
 
     def tit():
         top.title(message.get())
@@ -582,7 +586,8 @@ try:
     menu1.add_command(label='创建文件夹', command=md)
     menu1.add_command(label='删除文件夹', command=rd)
     menu1.add_command(label='清理python缓存', command=python_cache)
-    menu1.add_command(label='删除文件', command=remv)
+    if osname == 'nt':
+        menu1.add_command(label='删除文件', command=remv)
     menu1.add_command(label='永久删除文件', command=rm)
     menubar.add_cascade(label="文件管理", menu=menu1)
     top.config(menu=menubar)
@@ -670,8 +675,9 @@ try:
             run_cmd, [executable, abspath(__file__)], True)).pack(side=RIGHT)
     Button(text='计算器',
            command=lambda: MyThread(run_cmd, "calc", True)).pack(side=RIGHT)
-    Button(text='死亡之ping',
-           command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
+    if osname == 'nt':
+        Button(text='死亡之ping',
+            command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
     Button(text="yapf格式化", command=lambda: MyThread(yapfyapf)).pack(side=RIGHT)
     Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
     Button(text='颜色表', command=colours).pack(side=RIGHT)
