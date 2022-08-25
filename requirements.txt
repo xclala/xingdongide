@@ -1,8 +1,3 @@
-ipython
-setuptools
-ptpython
-bpython
-pip
 pyinstaller
 coverage
 yapf

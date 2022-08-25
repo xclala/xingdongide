@@ -5,20 +5,29 @@ try:
     from tkinter.filedialog import askopenfilename, asksaveasfilename
     from subprocess import PIPE, call
     from subprocess import run as run_cmd
-    from os.path import abspath
     from string import ascii_letters
     from keyword import kwlist
     from threading import Thread
     from sys import executable
     from os import name as osname
-    from platform import python_version_tuple
+    from platform import python_version_tuple, python_version
 
     opened_file_path = ""
+
+    def terminal_output(output):
+        root = Tk()
+        root.title("")
+        root.state("zoomed")
+        root.resizable(0, 0)
+        contents = ScrolledText(root, font=40)
+        contents.pack(side=BOTTOM, expand=True, fill=BOTH)
+        contents.delete('1.0', END)
+        contents.insert(INSERT, output)
+        mainloop()
 
     def hook_dropfiles(tkwindow_or_winfoid, func, force_unicode=False):
         if osname == 'nt':
             import ctypes
-            from ctypes.wintypes import DWORD
 
             hwnd = tkwindow_or_winfoid.winfo_id()\
                 if getattr(tkwindow_or_winfoid, "winfo_id", None)\
@@ -55,7 +64,7 @@ try:
             limit_num = 200
             for i in range(limit_num):
                 if i + 1 == limit_num:
-                    raise "over hook limit number 200, for protect computer."
+                    raise "over hook limit number 200, to protect the computer."
                 if "old_wndproc_%d" % i not in globals():
                     old, new = "old_wndproc_%d" % i, "new_wndproc_%d" % i
                     break
@@ -106,24 +115,23 @@ try:
         from os import rmdir
         rmdir(message.get())
 
-    def python_cache():
-        from os import removedir
-        removedir("__pycache__")
 
     def pip_install():
         top.title(f"正在用pip安装{message.get()}")
-        run_cmd([executable, "-m", "pip", "install",
+        o = run_cmd([executable, "-m", "pip", "install",
                  message.get()],
-                shell=True)
+                shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         messagebox.showinfo("安装完成", "安装完成")
         top.title("邢栋的集成开发环境")
 
     def pip_upgrade():
         top.title(f"正在用pip升级{message.get()}")
-        run_cmd(
+        o = run_cmd(
             [executable, "-m", "pip", "install", "--upgrade",
              message.get()],
-            shell=True)
+            shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         messagebox.showinfo("更新完成", "更新完成")
         top.title("邢栋的集成开发环境")
 
@@ -131,18 +139,22 @@ try:
         top.title(f"正在用pip卸载{message.get()}")
         run_cmd([executable, "-m", "pip", "uninstall",
                  message.get()],
-                shell=True)
+                shell=True,
+                stdout=PIPE)
+        terminal_output(o.stdout.decode())
         messagebox.showinfo("卸载完成", "卸载完成")
         top.title("邢栋的集成开发环境")
 
     def pip_install_uninstall():
         top.title(f"正在用pip重新安装{message.get()}")
-        run_cmd([executable, "-m", "pip", "uninstall",
+        o = run_cmd([executable, "-m", "pip", "uninstall",
                  message.get(), "-y"],
-                shell=True)
-        run_cmd([executable, "-m", "pip", "install",
+                shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
+        o = run_cmd([executable, "-m", "pip", "install",
                  message.get()],
-                shell=True)
+                shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         messagebox.showinfo("重新安装完成", "重新安装完成")
         top.title("邢栋的集成开发环境")
 
@@ -154,23 +166,38 @@ try:
             stdout=PIPE,
             shell=True)
         for i in loads(a.stdout.decode()):
-            run_cmd(
+            o = run_cmd(
                 [executable, "-m", "pip", "install", "--upgrade", i["name"]],
-                shell=True)
+                shell=True, stdout=PIPE)
+		terminal_output(o.stdout.decode())
         messagebox.showinfo("更新完成", "更新完成")
         top.title("邢栋的集成开发环境")
 
+    def pip_freeze():
+        top.title("正在获取...")
+        o = run_cmd([executable, "-m", "pip", "freeze"], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
+        top.title("邢栋的集成开发环境")
+
     def pip_show():
-        call(f"{executable} show {message.get()} --no-cache-dir ")
-        top.title(message.get())
+        top.title("正在获取...")
+        o = run_cmd([executable, "-m", "pip", "show"], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
+        top.title("邢栋的集成开发环境")
 
     def pip_search():
-        call(f"{executable} search {message.get()} --no-cache-dir ")
-        top.title(message.get())
+        top.title("正在获取...")
+        o = run_cmd([executable, "-m", "pip", "search"], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
+        top.title("邢栋的集成开发环境")
 
     def pip_check():
-        call(f"{executable} check {message.get()} --no-cache-dir ")
-        top.title(message.get())
+        top.title("正在获取...")
+        o = run_cmd([executable, "-m", "pip", "check"],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
+        top.title("邢栋的集成开发环境")
 
     def pip_download():
         top.title(f"正在用pip下载{message.get()}")
@@ -182,35 +209,41 @@ try:
 
     def python_run():
         global opened_file_path
-        call(f"{executable} {opened_file_path}")
+        o = run_cmd([executable, opened_file_path], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title(f"用python运行{opened_file_path}")
 
     def c_compile():
         global opened_file_path
-        call(f"gcc -O3 {opened_file_path}")
+        o = run_cmd(["gcc", "-O3", opened_file_path], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title(f"编译优化{opened_file_path}")
 
     def java_compile():
         global opened_file_path
-        call("javac " + opened_file_path)
+        o = run_cmd(["javac", opened_file_path], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title(f"java编译{opened_file_path}")
 
     def java_run():
         global opened_file_path
-        call("java " + opened_file_path)
+        o = run_cmd(["java", opened_file_path], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title(f"java运行{opened_file_path}")
 
     def pyinstaller_exe_c():
         global opened_file_path
         top.title(f"正在用pyinstaller打包命令行{opened_file_path}")
-        run_cmd(["pyinstaller", "-F", opened_file_path], shell=True)
+        o = run_cmd(["pyinstaller", "-F", opened_file_path], shell=True, stdout=PIPE)
+		terminal_output(o.stdout.decode())
         top.title("邢栋的集成开发环境")
         messagebox.showinfo("打包完成", "打包完成")
 
     def pyinstaller_exe_w():
         global opened_file_path
         top.title(f"正在用pyinstaller打包可视化{opened_file_path}")
-        run_cmd(["pyinstaller", "-F", "-w", opened_file_path], shell=True)
+        o = run_cmd(["pyinstaller", "-F", "-w", opened_file_path], shell=True, stdout=PIPE)
+		terminal_output(o.stdout.decode())
         top.title("邢栋的集成开发环境")
         messagebox.showinfo("打包完成", "打包完成")
 
@@ -228,30 +261,31 @@ try:
             top.title("正在攻击:" + message.get())
             run_cmd(['ping', '-l', '65500', message.get(), '-t'], shell=True)
 
-    def ipython_run():
-        global opened_file_path
-        call(f"ipython {opened_file_path}")
-        top.title(f"用ipython运行{opened_file_path}")
-
     def c_compile_run():
         global opened_file_path
-        call(f"gcc -O3 {opened_file_path} -o a.exe & a")
+		o = run_cmd(['gcc', '-O3', opened_file_path, '-o', 'a.exe', '&', "a.exe"], shell=True, stdout=True)
+        terminal_output(o.stdout.decode())
         top.title(f"编译运行c程序{opened_file_path}")
 
     def java_compile_run():
         global opened_file_path
-        call(f"javac {opened_file_path} & java {opened_file_path}.class")
+		o = run_cmd(['javac', opened_file_path], shell=True, stdout=PIPE)
+		terminal_output(o.stdout.decode())
+		o = run_cmd(['java', f"{opened_file_path}.class"], shell=True, stdout=PIPE)
+		terminal_output(o.stdout.decode())
         top.title(f"编译运行java程序{opened_file_path}")
 
     def c_i():
         global opened_file_path
-        call("gcc -O3 -E " + opened_file_path + " -o a.i")
+		o = run_cmd(['gcc', '-O3', '-E', opened_file_path, "-o", "a.i"], shell=True, stdout=PIPE)
+		terminal_output(o.stdout.decode())
         top.title(opened_file_path)
 
-    def c_s_intel():
+    def c_s():
         global opened_file_path
-        call("gcc -O3 -S -masm=intel " + opened_file_path + " -o a.s")
-        top.title(f"把{opened_file_path}编译成intel的汇编语言")
+        o = run_cmd(['gcc', '-O3', '-S', opened_file_path, "-o", "a.i"], shell=True, stdout=PIPE)
+		terminal_output(o.stdout.decode())
+        top.title(f"把{opened_file_path}编译成汇编语言")
 
     def rm():
         global opened_file_path
@@ -264,9 +298,10 @@ try:
             from win32com.shell import shell, shellcon
             global opened_file_path
             top.title(f"删除{opened_file_path}")
-            shell.SHFileOperation((0, shellcon.FO_DELETE, opened_file_path, None,
-                                   shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
-                                   | shellcon.FOF_NOCONFIRMATION, None, None))
+            shell.SHFileOperation(
+                (0, shellcon.FO_DELETE, opened_file_path, None,
+                 shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
+                 | shellcon.FOF_NOCONFIRMATION, None, None))
 
     def colours():
         top.title("颜色表")
@@ -288,14 +323,15 @@ try:
 
     def pydoc1():
         top.title("python第三方包文档")
-        call(f"{executable} -m pydoc {message.get()}")
+		o = run_cmd([executable, '-m', 'pydoc', message.get()], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
 
     def pydoc3():
         top.title("python第三方包文档")
         if message.get() == '':
-            call(f"{executable} -m pydoc -p 80 ")
-        else:
-            call(f"{executable} -m pydoc -p {message.get()} ")
+			port = 80
+		o = run_cmd([executable, '-m', 'pydoc', '-p', message.get()], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
 
     def tit():
         top.title(message.get())
@@ -322,12 +358,12 @@ try:
     def yapfyapf():
         from yapf.yapflib.yapf_api import FormatFile
         global opened_file_path
-        FormatFile(open_file_path, in_place=True)
+        FormatFile(opened_file_path, in_place=True)
         with open(opened_file_path, encoding='utf-8') as file:
             contents.delete('1.0', END)
             contents.insert(INSERT, file.read())
 
-    def requirement_install():
+    def requirements_install():
         top.title("正在安装requirements.txt")
         run_cmd([executable, "-m", "pip", "install", "-r", "requirements.txt"],
                 shell=True)
@@ -354,11 +390,6 @@ try:
         r.pack()
         Button(root, text="确定", command=replace_text).pack(side=BOTTOM)
         mainloop()
-
-    def python_ver():
-        from platform import python_version
-        messagebox.showinfo("python版本", python_version())
-        top.title("python版本")
 
     def alert_file_byte():
         global opened_file_path
@@ -546,7 +577,7 @@ try:
     kws = kwlist
     top = Tk()
     top.title("邢栋的集成开发环境")
-    top.geometry('1520x700')
+    top.state("zoomed")
     hook_dropfiles(top, func=dragged_load)
     menubar = Menu(top)
     contents = ScrolledText(font=40)
@@ -555,14 +586,13 @@ try:
     contents.bind('<KeyRelease>', on_key_release)
     contents.bind('<Control-o>', lambda event: load())
     contents.bind('<Control-S>', lambda event: resave())  #Ctrl+Shift+s
-    contents.bind('<Control-N>',
-                  lambda event: run_cmd(["python", abspath(__file__)],
-                                        shell=True))  #Ctrl+Shift+n
+    contents.bind('<Control-N>', lambda event: MyThread(
+        run_cmd, [executable, abspath(__file__)], True))  #Ctrl+Shift+n
     contents.tag_config('bif', foreground='tomato')
     contents.tag_config('kw', foreground='deepskyblue')
     contents.tag_config('comment', foreground='purple')
     contents.tag_config('string', foreground='green')
-    Label(text=abspath(__file__), fg='red').pack(side=LEFT)
+    Label(text=f"Python {python_version()}", fg='red').pack(side=LEFT)
     message = Entry(font=40)
     message.pack(side=LEFT, expand=True, fill=X)
     menu1 = Menu(menubar, tearoff=False)
@@ -584,7 +614,6 @@ try:
     menu1.add_command(label='显示字节数', command=alert_file_byte)
     menu1.add_command(label='创建文件夹', command=md)
     menu1.add_command(label='删除文件夹', command=rd)
-    menu1.add_command(label='清理python缓存', command=python_cache)
     if osname == 'nt':
         menu1.add_command(label='删除文件', command=remv)
     menu1.add_command(label='永久删除文件', command=rm)
@@ -596,8 +625,10 @@ try:
     menu2.add_command(label='检查依赖', command=lambda: MyThread(pip_check))
     menu2.add_command(label='搜索', command=lambda: MyThread(pip_search))
     menu2.add_command(label='查看信息', command=lambda: MyThread(pip_show))
-    menu2.add_command(label='用requirement.txt中的包安装',
-                      command=lambda: MyThread(requirement_install))
+    menu2.add_command(label='安装requirements.txt中的包',
+                      command=lambda: MyThread(requirements_install))
+    menu2.add_command(label='显示所有安装的包',
+                command=pip_freeze)
     menu2.add_command(label='下载安装包', command=lambda: MyThread(pip_download))
     menu2.add_command(label='卸载', command=lambda: MyThread(pip_uninstall))
     menu2.add_command(label='重新安装',
@@ -618,7 +649,7 @@ try:
                       command=lambda: MyThread(pyinstaller_exe_w))
     menu3.add_command(label='编译c程序', command=lambda: MyThread(c_compile))
     menu3.add_command(label='预处理c程序', command=lambda: MyThread(c_i))
-    menu3.add_command(label='编译c程序成汇编语言', command=lambda: MyThread(c_s_intel))
+    menu3.add_command(label='编译c程序成汇编语言', command=lambda: MyThread(c_s))
     menu3.add_command(label='编译运行c程序', command=lambda: MyThread(c_compile_run))
     menu3.add_command(label='运行go程序', command=lambda: MyThread(go_run))
     menu3.add_command(label='把go程序编译成exe文件',
