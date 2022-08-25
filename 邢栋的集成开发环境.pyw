@@ -11,6 +11,7 @@ try:
     from threading import Thread
     from sys import executable
     from os import name as osname
+    from platform import python_version_tuple
 
     opened_file_path = ""
 
@@ -28,7 +29,7 @@ try:
             argtype = ctypes.c_uint64
 
             prototype = ctypes.WINFUNCTYPE(argtype, argtype, argtype, argtype,
-                                        argtype)
+                                           argtype)
             WM_DROPFILES = 0x233
             GWL_WNDPROC = -4
             create_buffer = ctypes.create_unicode_buffer if force_unicode else ctypes.c_buffer
@@ -42,7 +43,7 @@ try:
                     files = []
                     for i in range(count):
                         func_DragQueryFile(argtype(wp), i, szFile,
-                                        ctypes.sizeof(szFile))
+                                           ctypes.sizeof(szFile))
                         dropname = szFile.value
                         files.append(dropname)
                     func(files)
@@ -153,7 +154,8 @@ try:
             stdout=PIPE,
             shell=True)
         for i in loads(a.stdout.decode()):
-            run_cmd([executable, "-m", "pip", "install", "--upgrade", i["name"]],
+            run_cmd(
+                [executable, "-m", "pip", "install", "--upgrade", i["name"]],
                 shell=True)
         messagebox.showinfo("更新完成", "更新完成")
         top.title("邢栋的集成开发环境")
@@ -268,8 +270,8 @@ try:
             global open_file_path
             top.title("删除" + open_file_path)
             shell.SHFileOperation((0, shellcon.FO_DELETE, open_file_path, None,
-                                shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
-                                | shellcon.FOF_NOCONFIRMATION, None, None))
+                                   shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
+                                   | shellcon.FOF_NOCONFIRMATION, None, None))
 
     def colours():
         top.title("颜色表")
@@ -337,12 +339,14 @@ try:
         top.title("安装完成")
 
     def Replace():
+
         def replace_text():
             temp = contents.get('1.0', END)
             contents.delete('1.0', END)
             contents.insert(INSERT, temp.replace(m.get(), r.get()))
             save()
             root.destroy()
+
         root = Tk()
         root.title("替换")
         root.geometry("200x150")
@@ -677,7 +681,7 @@ try:
            command=lambda: MyThread(run_cmd, "calc", True)).pack(side=RIGHT)
     if osname == 'nt':
         Button(text='死亡之ping',
-            command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
+               command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
     Button(text="yapf格式化", command=lambda: MyThread(yapfyapf)).pack(side=RIGHT)
     Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
     Button(text='颜色表', command=colours).pack(side=RIGHT)
@@ -690,6 +694,7 @@ try:
            command=lambda: MyThread(python_ver)).pack(side=RIGHT)
     Button(text="显示目录文件", command=dirdir).pack(side=RIGHT)
     Button(text="替换", command=Replace).pack(side=RIGHT)
-    mainloop()
+    if python_version_tuple()[0] == '3' and int(python_version_tuple()[1]) > 5:
+        mainloop()
 except Exception as e:
     print(e)
