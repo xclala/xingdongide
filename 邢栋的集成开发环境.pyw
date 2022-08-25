@@ -73,7 +73,7 @@ try:
         with open(opened_file_path, encoding='utf-8') as file:
             contents.delete('1.0', END)
             contents.insert(INSERT, file.read())
-        top.title("打开" + opened_file_path)
+        top.title(f"打开{opened_file_path}")
 
     def dragged_load(files):
         global opened_file_path
@@ -81,14 +81,14 @@ try:
         with open(opened_file_path, encoding='utf-8') as file:
             contents.delete('1.0', END)
             contents.insert(INSERT, file.read())
-        top.title("打开" + opened_file_path)
+        top.title(f"打开{opened_file_path}")
 
     def save():
         global opened_file_path
         if opened_file_path:
             with open(opened_file_path, 'w', encoding='utf-8') as file:
                 file.write(contents.get('1.0', END))
-            top.title("已保存" + opened_file_path)
+            top.title(f"已保存{opened_file_path}")
         resave()
 
     def resave():
@@ -96,7 +96,7 @@ try:
         opened_file_path = asksaveasfilename(title="另存为文件")
         with open(opened_file_path, 'w', encoding='utf-8') as file:
             file.write(contents.get('1.0', END))
-        top.title("另存为" + opened_file_path)
+        top.title(f"另存为{opened_file_path}")
 
     def md():
         from os import mkdir
@@ -161,15 +161,15 @@ try:
         top.title("邢栋的集成开发环境")
 
     def pip_show():
-        call(f"{executable} show {message.get()} --no-cache-dir & pause")
+        call(f"{executable} show {message.get()} --no-cache-dir ")
         top.title(message.get())
 
     def pip_search():
-        call(f"{executable} search {message.get()} --no-cache-dir & pause")
+        call(f"{executable} search {message.get()} --no-cache-dir ")
         top.title(message.get())
 
     def pip_check():
-        call(f"{executable} check {message.get()} --no-cache-dir & pause")
+        call(f"{executable} check {message.get()} --no-cache-dir ")
         top.title(message.get())
 
     def pip_download():
@@ -182,37 +182,34 @@ try:
 
     def python_run():
         global opened_file_path
-        call(
-            f"{executable} {opened_file_path} & echo ------------------ & pause"
-        )
-        top.title("用python运行" + opened_file_path)
+        call(f"{executable} {opened_file_path}")
+        top.title(f"用python运行{opened_file_path}")
 
     def c_compile():
         global opened_file_path
-        call("gcc -O3 " + opened_file_path +
-             "& echo ------------------ & pause")
-        top.title("编译优化" + opened_file_path)
+        call(f"gcc -O3 {opened_file_path}")
+        top.title(f"编译优化{opened_file_path}")
 
     def java_compile():
         global opened_file_path
-        call("javac " + opened_file_path + "& echo ------------------ & pause")
-        top.title("java编译" + opened_file_path)
+        call("javac " + opened_file_path)
+        top.title(f"java编译{opened_file_path}")
 
     def java_run():
         global opened_file_path
-        call("java " + opened_file_path + "& echo ------------------ & pause")
-        top.title("java运行" + opened_file_path)
+        call("java " + opened_file_path)
+        top.title(f"java运行{opened_file_path}")
 
     def pyinstaller_exe_c():
         global opened_file_path
-        top.title("正在用pyinstaller打包命令行" + opened_file_path)
+        top.title(f"正在用pyinstaller打包命令行{opened_file_path}")
         run_cmd(["pyinstaller", "-F", opened_file_path], shell=True)
         top.title("邢栋的集成开发环境")
         messagebox.showinfo("打包完成", "打包完成")
 
     def pyinstaller_exe_w():
         global opened_file_path
-        top.title("正在用pyinstaller打包可视化" + opened_file_path)
+        top.title(f"正在用pyinstaller打包可视化{opened_file_path}")
         run_cmd(["pyinstaller", "-F", "-w", opened_file_path], shell=True)
         top.title("邢栋的集成开发环境")
         messagebox.showinfo("打包完成", "打包完成")
@@ -228,25 +225,23 @@ try:
 
     def hack_ping():
         if osname == "nt":
-            call("ping -l 65500 " + message.get() + " -t & pause")
-            top.title("目标IP:" + message.get())
+            top.title("正在攻击:" + message.get())
+            run_cmd(['ping', '-l', '65500', message.get(), '-t'], shell=True)
 
     def ipython_run():
         global opened_file_path
-        call("ipython " + opened_file_path +
-             "& echo ------------------ & pause")
-        top.title("用ipython运行" + opened_file_path)
+        call(f"ipython {opened_file_path}")
+        top.title(f"用ipython运行{opened_file_path}")
 
     def c_compile_run():
         global opened_file_path
-        call("gcc -O3 " + opened_file_path + "-o a.exe & a & pause")
-        top.title("编译运行c程序" + opened_file_path)
+        call(f"gcc -O3 {opened_file_path} -o a.exe & a")
+        top.title(f"编译运行c程序{opened_file_path}")
 
     def java_compile_run():
         global opened_file_path
-        call("javac " + opened_file_path + "& java " + opened_file_path +
-             ".class" + "& pause")
-        top.title("编译运行java程序" + opened_file_path)
+        call(f"javac {opened_file_path} & java {opened_file_path}.class")
+        top.title(f"编译运行java程序{opened_file_path}")
 
     def c_i():
         global opened_file_path
@@ -256,20 +251,20 @@ try:
     def c_s_intel():
         global opened_file_path
         call("gcc -O3 -S -masm=intel " + opened_file_path + " -o a.s")
-        top.title("把" + opened_file_path + "编译成intel的汇编语言")
+        top.title(f"把{opened_file_path}编译成intel的汇编语言")
 
     def rm():
-        global open_file_path
+        global opened_file_path
         from os import remove
-        remove(open_file_path)
-        top.title("已永久删除" + open_file_path)
+        remove(opened_file_path)
+        top.title(f"已永久删除{opened_file_path}")
 
     def remv():
         if osname == 'nt':
             from win32com.shell import shell, shellcon
-            global open_file_path
-            top.title("删除" + open_file_path)
-            shell.SHFileOperation((0, shellcon.FO_DELETE, open_file_path, None,
+            global opened_file_path
+            top.title(f"删除{opened_file_path}")
+            shell.SHFileOperation((0, shellcon.FO_DELETE, opened_file_path, None,
                                    shellcon.FOF_SILENT | shellcon.FOF_ALLOWUNDO
                                    | shellcon.FOF_NOCONFIRMATION, None, None))
 
@@ -293,28 +288,28 @@ try:
 
     def pydoc1():
         top.title("python第三方包文档")
-        call(f"{executable} -m pydoc {message.get()}& pause")
+        call(f"{executable} -m pydoc {message.get()}")
 
     def pydoc3():
         top.title("python第三方包文档")
         if message.get() == '':
-            call(f"{executable} -m pydoc -p 80 & pause")
+            call(f"{executable} -m pydoc -p 80 ")
         else:
-            call(f"{executable} -m pydoc -p {message.get()} & pause")
+            call(f"{executable} -m pydoc -p {message.get()} ")
 
     def tit():
         top.title(message.get())
 
     def pdb_debug():
         top.title("调试")
-        call(f"{executable} -m pdb {opened_file_path} & pause")
+        call(f"{executable} -m pdb {opened_file_path} ")
 
     def pythoni():
         top.title("运行python程序后运行交互式python")
         call(f"{executable} -i {opened_file_path}")
 
     def speed():
-        call("python -m cProfile " + message.get() + "& pause")
+        call("python -m cProfile " + message.get() + "")
 
     def dirdir():
         root = Tk()
@@ -373,13 +368,13 @@ try:
                             "约" + str(getsize(opened_file_path)) + "字节")
 
     def coverage_run():
-        call(f"coverage run {message.get()} & pause")
+        call(f"coverage run {message.get()} ")
 
     def coverage_report():
-        call(f"coverage report -m {message.get()} & pause")
+        call(f"coverage report -m {message.get()} ")
 
     def coverage_html():
-        call("coverage html -d report & pause")
+        call("coverage html -d report ")
 
     def on_closing():
         if contents.get('1.0', END).strip():
