@@ -3,7 +3,7 @@ try:
     from tkinter import messagebox
     from tkinter.scrolledtext import ScrolledText
     from tkinter.filedialog import askopenfilename, asksaveasfilename
-    from subprocess import PIPE, call
+    from subprocess import PIPE
     from subprocess import run as run_cmd
     from string import ascii_letters
     from keyword import kwlist
@@ -115,12 +115,12 @@ try:
         from os import rmdir
         rmdir(message.get())
 
-
     def pip_install():
         top.title(f"正在用pip安装{message.get()}")
         o = run_cmd([executable, "-m", "pip", "install",
-                 message.get()],
-                shell=True, stdout=PIPE)
+                     message.get()],
+                    shell=True,
+                    stdout=PIPE)
         terminal_output(o.stdout.decode())
         messagebox.showinfo("安装完成", "安装完成")
         top.title("邢栋的集成开发环境")
@@ -130,7 +130,8 @@ try:
         o = run_cmd(
             [executable, "-m", "pip", "install", "--upgrade",
              message.get()],
-            shell=True, stdout=PIPE)
+            shell=True,
+            stdout=PIPE)
         terminal_output(o.stdout.decode())
         messagebox.showinfo("更新完成", "更新完成")
         top.title("邢栋的集成开发环境")
@@ -147,13 +148,16 @@ try:
 
     def pip_install_uninstall():
         top.title(f"正在用pip重新安装{message.get()}")
-        o = run_cmd([executable, "-m", "pip", "uninstall",
-                 message.get(), "-y"],
-                shell=True, stdout=PIPE)
+        o = run_cmd(
+            [executable, "-m", "pip", "uninstall",
+             message.get(), "-y"],
+            shell=True,
+            stdout=PIPE)
         terminal_output(o.stdout.decode())
         o = run_cmd([executable, "-m", "pip", "install",
-                 message.get()],
-                shell=True, stdout=PIPE)
+                     message.get()],
+                    shell=True,
+                    stdout=PIPE)
         terminal_output(o.stdout.decode())
         messagebox.showinfo("重新安装完成", "重新安装完成")
         top.title("邢栋的集成开发环境")
@@ -168,14 +172,17 @@ try:
         for i in loads(a.stdout.decode()):
             o = run_cmd(
                 [executable, "-m", "pip", "install", "--upgrade", i["name"]],
-                shell=True, stdout=PIPE)
-		terminal_output(o.stdout.decode())
+                shell=True,
+                stdout=PIPE)
+        terminal_output(o.stdout.decode())
         messagebox.showinfo("更新完成", "更新完成")
         top.title("邢栋的集成开发环境")
 
     def pip_freeze():
         top.title("正在获取...")
-        o = run_cmd([executable, "-m", "pip", "freeze"], shell=True, stdout=PIPE)
+        o = run_cmd([executable, "-m", "pip", "freeze"],
+                    shell=True,
+                    stdout=PIPE)
         terminal_output(o.stdout.decode())
         top.title("邢栋的集成开发环境")
 
@@ -187,7 +194,9 @@ try:
 
     def pip_search():
         top.title("正在获取...")
-        o = run_cmd([executable, "-m", "pip", "search"], shell=True, stdout=PIPE)
+        o = run_cmd([executable, "-m", "pip", "search"],
+                    shell=True,
+                    stdout=PIPE)
         terminal_output(o.stdout.decode())
         top.title("邢栋的集成开发环境")
 
@@ -234,16 +243,20 @@ try:
     def pyinstaller_exe_c():
         global opened_file_path
         top.title(f"正在用pyinstaller打包命令行{opened_file_path}")
-        o = run_cmd(["pyinstaller", "-F", opened_file_path], shell=True, stdout=PIPE)
-		terminal_output(o.stdout.decode())
+        o = run_cmd(["pyinstaller", "-F", opened_file_path],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title("邢栋的集成开发环境")
         messagebox.showinfo("打包完成", "打包完成")
 
     def pyinstaller_exe_w():
         global opened_file_path
         top.title(f"正在用pyinstaller打包可视化{opened_file_path}")
-        o = run_cmd(["pyinstaller", "-F", "-w", opened_file_path], shell=True, stdout=PIPE)
-		terminal_output(o.stdout.decode())
+        o = run_cmd(["pyinstaller", "-F", "-w", opened_file_path],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title("邢栋的集成开发环境")
         messagebox.showinfo("打包完成", "打包完成")
 
@@ -263,28 +276,37 @@ try:
 
     def c_compile_run():
         global opened_file_path
-		o = run_cmd(['gcc', '-O3', opened_file_path, '-o', 'a.exe', '&', "a.exe"], shell=True, stdout=True)
+        o = run_cmd(
+            ['gcc', '-O3', opened_file_path, '-o', 'a.exe', '&', "a.exe"],
+            shell=True,
+            stdout=True)
         terminal_output(o.stdout.decode())
         top.title(f"编译运行c程序{opened_file_path}")
 
     def java_compile_run():
         global opened_file_path
-		o = run_cmd(['javac', opened_file_path], shell=True, stdout=PIPE)
-		terminal_output(o.stdout.decode())
-		o = run_cmd(['java', f"{opened_file_path}.class"], shell=True, stdout=PIPE)
-		terminal_output(o.stdout.decode())
+        o = run_cmd(['javac', opened_file_path], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
+        o = run_cmd(['java', f"{opened_file_path}.class"],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title(f"编译运行java程序{opened_file_path}")
 
     def c_i():
         global opened_file_path
-		o = run_cmd(['gcc', '-O3', '-E', opened_file_path, "-o", "a.i"], shell=True, stdout=PIPE)
-		terminal_output(o.stdout.decode())
+        o = run_cmd(['gcc', '-O3', '-E', opened_file_path, "-o", "a.i"],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title(opened_file_path)
 
     def c_s():
         global opened_file_path
-        o = run_cmd(['gcc', '-O3', '-S', opened_file_path, "-o", "a.i"], shell=True, stdout=PIPE)
-		terminal_output(o.stdout.decode())
+        o = run_cmd(['gcc', '-O3', '-S', opened_file_path, "-o", "a.i"],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title(f"把{opened_file_path}编译成汇编语言")
 
     def rm():
@@ -323,29 +345,31 @@ try:
 
     def pydoc1():
         top.title("python第三方包文档")
-		o = run_cmd([executable, '-m', 'pydoc', message.get()], shell=True, stdout=PIPE)
+        o = run_cmd([executable, '-m', 'pydoc',
+                     message.get()],
+                    shell=True,
+                    stdout=PIPE)
         terminal_output(o.stdout.decode())
 
     def pydoc3():
         top.title("python第三方包文档")
         if message.get() == '':
-			port = 80
-		o = run_cmd([executable, '-m', 'pydoc', '-p', message.get()], shell=True, stdout=PIPE)
+            port = 80
+        o = run_cmd([executable, '-m', 'pydoc', '-p',
+                     message.get()],
+                    shell=True,
+                    stdout=PIPE)
         terminal_output(o.stdout.decode())
 
     def tit():
         top.title(message.get())
 
-    def pdb_debug():
-        top.title("调试")
-        call(f"{executable} -m pdb {opened_file_path} ")
-
-    def pythoni():
-        top.title("运行python程序后运行交互式python")
-        call(f"{executable} -i {opened_file_path}")
-
     def speed():
-        call("python -m cProfile " + message.get() + "")
+        global opened_file_path
+        o = run_cmd([executable, '-m', 'cProfile', opened_file_path],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
 
     def dirdir():
         root = Tk()
@@ -399,13 +423,25 @@ try:
                             "约" + str(getsize(opened_file_path)) + "字节")
 
     def coverage_run():
-        call(f"coverage run {message.get()} ")
+        global opened_file_path
+        o = run_cmd(['coverage', 'run', opened_file_path],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
 
     def coverage_report():
-        call(f"coverage report -m {message.get()} ")
+        global opened_file_path
+        o = run_cmd(['coverage', 'report', "-m", opened_file_path],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
 
     def coverage_html():
-        call("coverage html -d report ")
+        global opened_file_path
+        o = run_cmd(['coverage', 'html', "-d", "report"],
+                    shell=True,
+                    stdout=PIPE)
+        terminal_output(o.stdout.decode())
 
     def on_closing():
         if contents.get('1.0', END).strip():
@@ -515,11 +551,15 @@ try:
         contents.tag_config('string', foreground='green')
 
     def go_run():
-        call(f"go run {message.get()}")
+        global opened_file_path
+        run_cmd(['go', 'run', opened_file_path], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title("运行go程序")
 
     def go_build():
-        call(f"go build {message.get()}")
+        global opened_file_path
+        run_cmd(['go', 'build', opened_file_path], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title("把go程序编译成exe文件")
 
     class MyThread(Thread):
@@ -535,30 +575,34 @@ try:
             self.func(*self.args)
 
     def git_init():
-        call("git init")
+        run_cmd(['git', 'init'], shell=True, stdout=PIPE)
         top.title("git init")
 
     def git_add():
         t = message.get()
         if t == '':
             t = '.'
-        call("git add " + t)
+        run_cmd(['git', 'add', t], shell=True, stdout=PIPE)
         top.title("git add")
 
     def git_commit():
-        call(f'git commit -m "{message.get()}"')
+        run_cmd(['git', 'commit', "-m", message.get()], shell=True, stdout=PIPE)
         top.title("git commit")
 
     def git_diff():
-        call("git diff")
+        o = run_cmd(['git', 'diff'], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
         top.title("git diff")
 
     def git_clone():
-        call("git clone " + message.get())
         top.title("git clone")
+        run_cmd(['git', 'clone', message.get()], shell=True, stdout=PIPE)
+        top.title("邢栋的集成开发环境")
 
     def mypy_type():
-        call("mypy " + message.get())
+        global opened_file_path
+        o = run_cmd(['mypy', opened_file_path], shell=True, stdout=PIPE)
+        terminal_output(o.stdout.decode())
 
     def pythonorg():
         from webbrowser import open
@@ -627,8 +671,7 @@ try:
     menu2.add_command(label='查看信息', command=lambda: MyThread(pip_show))
     menu2.add_command(label='安装requirements.txt中的包',
                       command=lambda: MyThread(requirements_install))
-    menu2.add_command(label='显示所有安装的包',
-                command=pip_freeze)
+    menu2.add_command(label='显示所有安装的包', command=pip_freeze)
     menu2.add_command(label='下载安装包', command=lambda: MyThread(pip_download))
     menu2.add_command(label='卸载', command=lambda: MyThread(pip_uninstall))
     menu2.add_command(label='重新安装',
@@ -641,8 +684,6 @@ try:
     menu3.add_command(label='运行python程序', command=lambda: MyThread(python_run))
     menu3.add_command(label='用ipython运行python程序',
                       command=lambda: MyThread(ipython_run))
-    menu3.add_command(label='运行python程序后运行交互式python',
-                      command=lambda: MyThread(pythoni))
     menu3.add_command(label='把python程序编译成命令行的exe',
                       command=lambda: MyThread(pyinstaller_exe_c))
     menu3.add_command(label='把python程序编译成可视化的exe',
@@ -661,9 +702,10 @@ try:
     menubar.add_cascade(label="编译与运行", menu=menu3)
     top.config(menu=menubar)
     menu4 = Menu(menubar, tearoff=False)
-    menu4.add_command(label='cmd', command=lambda: MyThread(call, "cmd"))
+    menu4.add_command(label='cmd',
+                      command=lambda: MyThread(run_cmd, "cmd", True))
     menu4.add_command(label='powershell',
-                      command=lambda: MyThread(call, "powershell"))
+                      command=lambda: MyThread(run_cmd, "powershell", True))
     menubar.add_cascade(label="命令行", menu=menu4)
     top.config(menu=menubar)
     menu5 = Menu(menubar, tearoff=False)
@@ -672,32 +714,27 @@ try:
     menubar.add_cascade(label="第三方包文档", menu=menu5)
     top.config(menu=menubar)
     menu6 = Menu(menubar, tearoff=False)
-    menu6.add_command(label='显示运行速度', command=speed)
-    menu6.add_command(label='用pdb调试', command=lambda: MyThread(pdb_debug))
-    menubar.add_cascade(label='python调试', menu=menu6)
+    menu6.add_command(label='修改为1号风格（默认）', command=normal_theme)
+    menu6.add_command(label='修改为2号风格', command=other_theme)
+    menu6.add_command(label='修改为3号风格', command=third_theme)
+    menu6.add_command(label='修改为4号风格', command=fourth_theme)
+    menubar.add_cascade(label='语法高亮风格', menu=menu6)
     top.config(menu=menubar)
     menu7 = Menu(menubar, tearoff=False)
-    menu7.add_command(label='修改为1号风格（默认）', command=normal_theme)
-    menu7.add_command(label='修改为2号风格', command=other_theme)
-    menu7.add_command(label='修改为3号风格', command=third_theme)
-    menu7.add_command(label='修改为4号风格', command=fourth_theme)
-    menubar.add_cascade(label='语法高亮风格', menu=menu7)
+    menu7.add_command(label='生成测试文件并运行',
+                      command=lambda: MyThread(coverage_run))
+    menu7.add_command(label='显示结果', command=lambda: MyThread(coverage_report))
+    menu7.add_command(label='生成html文件夹',
+                      command=lambda: MyThread(coverage_html))
+    menubar.add_cascade(label='python测试覆盖率', menu=menu7)
     top.config(menu=menubar)
     menu8 = Menu(menubar, tearoff=False)
-    menu8.add_command(label='生成测试文件并运行',
-                      command=lambda: MyThread(coverage_run))
-    menu8.add_command(label='显示结果', command=lambda: MyThread(coverage_report))
-    menu8.add_command(label='生成html文件夹',
-                      command=lambda: MyThread(coverage_html))
-    menubar.add_cascade(label='python测试覆盖率', menu=menu8)
-    top.config(menu=menubar)
-    menu9 = Menu(menubar, tearoff=False)
-    menu9.add_command(label='init', command=lambda: MyThread(git_init))
-    menu9.add_command(label='add', command=lambda: MyThread(git_add))
-    menu9.add_command(label='clone', command=lambda: MyThread(git_clone))
-    menu9.add_command(label='commit', command=lambda: MyThread(git_commit))
-    menu9.add_command(label='diff', command=lambda: MyThread(git_diff))
-    menubar.add_cascade(label='git', menu=menu9)
+    menu8.add_command(label='init', command=lambda: MyThread(git_init))
+    menu8.add_command(label='add', command=lambda: MyThread(git_add))
+    menu8.add_command(label='clone', command=lambda: MyThread(git_clone))
+    menu8.add_command(label='commit', command=lambda: MyThread(git_commit))
+    menu8.add_command(label='diff', command=lambda: MyThread(git_diff))
+    menubar.add_cascade(label='git', menu=menu8)
     top.config(menu=menubar)
     Button(
         text='再启动一个窗口',
@@ -710,6 +747,7 @@ try:
                command=lambda: MyThread(hack_ping)).pack(side=RIGHT)
     Button(text="yapf格式化", command=lambda: MyThread(yapfyapf)).pack(side=RIGHT)
     Button(text='创建虚拟环境', command=lambda: MyThread(vtenv)).pack(side=RIGHT)
+    Button(text='显示运行速度', command=lambda: MyThread(speed)).pack(side=RIGHT)
     Button(text='颜色表', command=colours).pack(side=RIGHT)
     Button(text='修改标题', command=tit).pack(side=RIGHT)
     Button(text='类型检查', command=lambda: MyThread(mypy_type)).pack(side=RIGHT)

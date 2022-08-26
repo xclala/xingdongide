@@ -2,3 +2,4 @@ pyinstaller
 coverage
 yapf
 pypiwin32
+mypy
