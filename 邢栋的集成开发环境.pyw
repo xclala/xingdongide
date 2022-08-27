@@ -10,6 +10,7 @@ try:
     from threading import Thread
     from sys import executable
     from os import name as osname
+    from os.path import abspath
     from platform import python_version_tuple, python_version
 
     opened_file_path = ""
@@ -372,12 +373,11 @@ try:
         terminal_output(o.stdout.decode())
 
     def dirdir():
-        root = Tk()
-        root.title("显示目录下的文件")
-        root.geometry("1000x700")
-        _ = run_cmd(["dir", "/a", "/q"], shell=True, stdout=PIPE)
-        Label(root, text=_.stdout.decode("gb2312")).pack(side=TOP)
-        mainloop()
+        from os import scandir
+        _ = []
+        for item in scandir('.'):
+            _.append(item.path)
+        terminal_output(_)
 
     def yapfyapf():
         from yapf.yapflib.yapf_api import FormatFile
@@ -682,8 +682,6 @@ try:
     top.config(menu=menubar)
     menu3 = Menu(menubar, tearoff=False)
     menu3.add_command(label='运行python程序', command=lambda: MyThread(python_run))
-    menu3.add_command(label='用ipython运行python程序',
-                      command=lambda: MyThread(ipython_run))
     menu3.add_command(label='把python程序编译成命令行的exe',
                       command=lambda: MyThread(pyinstaller_exe_c))
     menu3.add_command(label='把python程序编译成可视化的exe',
