@@ -15,6 +15,18 @@ try:
 
     opened_file_path = ""
 
+    class MyThread(Thread):
+
+        def __init__(self, func, *args):
+            super().__init__()
+            self.func = func
+            self.args = args
+            self.daemon = True
+            self.start()
+
+        def run(self):
+            self.func(*self.args)
+
     def terminal_output(output):
         root = Tk()
         root.title("")
@@ -139,10 +151,10 @@ try:
 
     def pip_uninstall():
         top.title(f"正在用pip卸载{message.get()}")
-        run_cmd([executable, "-m", "pip", "uninstall",
-                 message.get()],
-                shell=True,
-                stdout=PIPE)
+        o = run_cmd([executable, "-m", "pip", "uninstall",
+                     message.get()],
+                    shell=True,
+                    stdout=PIPE)
         terminal_output(o.stdout.decode())
         messagebox.showinfo("卸载完成", "卸载完成")
         top.title("邢栋的集成开发环境")
@@ -241,20 +253,13 @@ try:
         terminal_output(o.stdout.decode())
         top.title(f"java运行{opened_file_path}")
 
-    def pyinstaller_exe_c():
+    def pyinstaller_exe(window):
+        _ = ""
+        if window:
+            _ = "-w"
         global opened_file_path
-        top.title(f"正在用pyinstaller打包命令行{opened_file_path}")
-        o = run_cmd(["pyinstaller", "-F", opened_file_path],
-                    shell=True,
-                    stdout=PIPE)
-        terminal_output(o.stdout.decode())
-        top.title("邢栋的集成开发环境")
-        messagebox.showinfo("打包完成", "打包完成")
-
-    def pyinstaller_exe_w():
-        global opened_file_path
-        top.title(f"正在用pyinstaller打包可视化{opened_file_path}")
-        o = run_cmd(["pyinstaller", "-F", "-w", opened_file_path],
+        top.title(f"正在用pyinstaller打包{opened_file_path}")
+        o = run_cmd(["pyinstaller", "-F", _, opened_file_path],
                     shell=True,
                     stdout=PIPE)
         terminal_output(o.stdout.decode())
@@ -552,27 +557,15 @@ try:
 
     def go_run():
         global opened_file_path
-        run_cmd(['go', 'run', opened_file_path], shell=True, stdout=PIPE)
+        o = run_cmd(['go', 'run', opened_file_path], shell=True, stdout=PIPE)
         terminal_output(o.stdout.decode())
         top.title("运行go程序")
 
     def go_build():
         global opened_file_path
-        run_cmd(['go', 'build', opened_file_path], shell=True, stdout=PIPE)
+        o = run_cmd(['go', 'build', opened_file_path], shell=True, stdout=PIPE)
         terminal_output(o.stdout.decode())
         top.title("把go程序编译成exe文件")
-
-    class MyThread(Thread):
-
-        def __init__(self, func, *args):
-            super().__init__()
-            self.func = func
-            self.args = args
-            self.daemon = True
-            self.start()
-
-        def run(self):
-            self.func(*self.args)
 
     def git_init():
         run_cmd(['git', 'init'], shell=True, stdout=PIPE)
@@ -586,7 +579,9 @@ try:
         top.title("git add")
 
     def git_commit():
-        run_cmd(['git', 'commit', "-m", message.get()], shell=True, stdout=PIPE)
+        run_cmd(['git', 'commit', "-m", message.get()],
+                shell=True,
+                stdout=PIPE)
         top.title("git commit")
 
     def git_diff():
@@ -622,11 +617,10 @@ try:
     top = Tk()
     top.title("邢栋的集成开发环境")
     top.state("zoomed")
+    top.protocol("WM_DELETE_WINDOW", on_closing)
     hook_dropfiles(top, func=dragged_load)
-    menubar = Menu(top)
     contents = ScrolledText(font=40)
     contents.pack(side=BOTTOM, expand=True, fill=BOTH)
-    top.protocol("WM_DELETE_WINDOW", on_closing)
     contents.bind('<KeyRelease>', on_key_release)
     contents.bind('<Control-o>', lambda event: load())
     contents.bind('<Control-S>', lambda event: resave())  #Ctrl+Shift+s
@@ -639,6 +633,7 @@ try:
     Label(text=f"Python {python_version()}", fg='red').pack(side=LEFT)
     message = Entry(font=40)
     message.pack(side=LEFT, expand=True, fill=X)
+    menubar = Menu(top)
     menu1 = Menu(menubar, tearoff=False)
     menu1.add_command(label='打开文件', command=load)
     menu1.add_command(label='保存文件', command=save)
@@ -683,9 +678,9 @@ try:
     menu3 = Menu(menubar, tearoff=False)
     menu3.add_command(label='运行python程序', command=lambda: MyThread(python_run))
     menu3.add_command(label='把python程序编译成命令行的exe',
-                      command=lambda: MyThread(pyinstaller_exe_c))
+                      command=lambda: MyThread(pyinstaller_exe, False))
     menu3.add_command(label='把python程序编译成可视化的exe',
-                      command=lambda: MyThread(pyinstaller_exe_w))
+                      command=lambda: MyThread(pyinstaller_exe, True))
     menu3.add_command(label='编译c程序', command=lambda: MyThread(c_compile))
     menu3.add_command(label='预处理c程序', command=lambda: MyThread(c_i))
     menu3.add_command(label='编译c程序成汇编语言', command=lambda: MyThread(c_s))
@@ -752,8 +747,6 @@ try:
     Button(text='百度', command=lambda: MyThread(baidu)).pack(side=RIGHT)
     Button(text='python官网',
            command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
-    Button(text='python版本',
-           command=lambda: MyThread(python_ver)).pack(side=RIGHT)
     Button(text="显示目录文件", command=dirdir).pack(side=RIGHT)
     Button(text="替换", command=Replace).pack(side=RIGHT)
     if python_version_tuple()[0] == '3' and int(python_version_tuple()[1]) > 5:
