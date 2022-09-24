@@ -105,20 +105,16 @@ try:
             contents.insert(INSERT, file.read())
         top.title(f"打开{opened_file_path}")
 
-    def save():
+    def save(resave=False):
         global opened_file_path
-        if opened_file_path:
-            with open(opened_file_path, 'w', encoding='utf-8') as file:
-                file.write(contents.get('1.0', END))
-            top.title(f"已保存{opened_file_path}")
-        resave()
-
-    def resave():
-        global opened_file_path
-        opened_file_path = asksaveasfilename(title="另存为文件")
+        if not opened_file_path:
+            opened_file_path = asksaveasfilename(title="另存为文件")
+            resave = True
+        if resave:
+            opened_file_path = asksaveasfilename(title="另存为文件")
         with open(opened_file_path, 'w', encoding='utf-8') as file:
             file.write(contents.get('1.0', END))
-        top.title(f"另存为{opened_file_path}")
+        top.title(f"已保存{opened_file_path}")
 
     def md():
         from os import mkdir
@@ -152,7 +148,7 @@ try:
     def pip_uninstall():
         top.title(f"正在用pip卸载{message.get()}")
         o = run_cmd([executable, "-m", "pip", "uninstall",
-                     message.get()],
+                     message.get(), "-y"],
                     shell=True,
                     stdout=PIPE)
         terminal_output(o.stdout.decode())
@@ -161,17 +157,8 @@ try:
 
     def pip_install_uninstall():
         top.title(f"正在用pip重新安装{message.get()}")
-        o = run_cmd(
-            [executable, "-m", "pip", "uninstall",
-             message.get(), "-y"],
-            shell=True,
-            stdout=PIPE)
-        terminal_output(o.stdout.decode())
-        o = run_cmd([executable, "-m", "pip", "install",
-                     message.get()],
-                    shell=True,
-                    stdout=PIPE)
-        terminal_output(o.stdout.decode())
+        pip_uninstall()
+        pip_install()
         messagebox.showinfo("重新安装完成", "重新安装完成")
         top.title("邢栋的集成开发环境")
 
@@ -623,7 +610,8 @@ try:
     contents.pack(side=BOTTOM, expand=True, fill=BOTH)
     contents.bind('<KeyRelease>', on_key_release)
     contents.bind('<Control-o>', lambda event: load())
-    contents.bind('<Control-S>', lambda event: resave())  #Ctrl+Shift+s
+    contents.bind('<Control-S>',
+                  lambda event: save(resave=True))  #Ctrl+Shift+s
     contents.bind('<Control-N>', lambda event: MyThread(
         run_cmd, [executable, abspath(__file__)], True))  #Ctrl+Shift+n
     contents.tag_config('bif', foreground='tomato')
@@ -637,7 +625,7 @@ try:
     menu1 = Menu(menubar, tearoff=False)
     menu1.add_command(label='打开文件', command=load)
     menu1.add_command(label='保存文件', command=save)
-    menu1.add_command(label='另存为文件', command=resave)
+    menu1.add_command(label='另存为文件', command=lambda: save(resave=True))
     menu1.add_command(label='隐藏文件',
                       command=run_cmd(
                           ["attrib", "+H", message.get()], shell=True))
