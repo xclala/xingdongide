@@ -155,11 +155,9 @@ try:
         messagebox.showinfo("卸载完成", "卸载完成")
         top.title("邢栋的集成开发环境")
 
-    def pip_install_uninstall():
-        top.title(f"正在用pip重新安装{message.get()}")
+    def pip_reinstall():
         pip_uninstall()
         pip_install()
-        messagebox.showinfo("重新安装完成", "重新安装完成")
         top.title("邢栋的集成开发环境")
 
     def upgrade_all_packages():
@@ -658,7 +656,7 @@ try:
     menu2.add_command(label='下载安装包', command=lambda: MyThread(pip_download))
     menu2.add_command(label='卸载', command=lambda: MyThread(pip_uninstall))
     menu2.add_command(label='重新安装',
-                      command=lambda: MyThread(pip_install_uninstall))
+                      command=lambda: MyThread(pip_reinstall))
     menu2.add_command(label='升级', command=lambda: MyThread(pip_upgrade))
     menu2.add_command(label='安装', command=lambda: MyThread(pip_install))
     menubar.add_cascade(label="python第三方包管理器", menu=menu2)
