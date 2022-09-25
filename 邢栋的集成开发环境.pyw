@@ -124,40 +124,24 @@ try:
         from os import rmdir
         rmdir(message.get())
 
-    def pip_install():
-        top.title(f"正在用pip安装{message.get()}")
-        o = run_cmd([executable, "-m", "pip", "install",
-                     message.get()],
-                    shell=True,
-                    stdout=PIPE)
+    def pip(arg):
+        top.title("pip")
+        base = [executable, '-m', 'pip', arg, message.get()]
+        if arg == 'upgrade':
+            base[3] = 'install'
+            base.insert(4, '--upgrade')
+        if arg == 'requirements_install':
+            base[3] = 'install'
+            base.insert(4, '-r')
+            base.insert(5, 'requirements.txt')
+        o = run_cmd(base, shell=True, stdout=PIPE)
         terminal_output(o.stdout.decode())
-        messagebox.showinfo("安装完成", "安装完成")
-        top.title("邢栋的集成开发环境")
-
-    def pip_upgrade():
-        top.title(f"正在用pip升级{message.get()}")
-        o = run_cmd(
-            [executable, "-m", "pip", "install", "--upgrade",
-             message.get()],
-            shell=True,
-            stdout=PIPE)
-        terminal_output(o.stdout.decode())
-        messagebox.showinfo("更新完成", "更新完成")
-        top.title("邢栋的集成开发环境")
-
-    def pip_uninstall():
-        top.title(f"正在用pip卸载{message.get()}")
-        o = run_cmd([executable, "-m", "pip", "uninstall",
-                     message.get(), "-y"],
-                    shell=True,
-                    stdout=PIPE)
-        terminal_output(o.stdout.decode())
-        messagebox.showinfo("卸载完成", "卸载完成")
+        messagebox.showinfo("运行完成", "运行完成")
         top.title("邢栋的集成开发环境")
 
     def pip_reinstall():
-        pip_uninstall()
-        pip_install()
+        pip("uninstall")
+        pip("install")
         top.title("邢栋的集成开发环境")
 
     def upgrade_all_packages():
@@ -174,44 +158,6 @@ try:
                 stdout=PIPE)
         terminal_output(o.stdout.decode())
         messagebox.showinfo("更新完成", "更新完成")
-        top.title("邢栋的集成开发环境")
-
-    def pip_freeze():
-        top.title("正在获取...")
-        o = run_cmd([executable, "-m", "pip", "freeze"],
-                    shell=True,
-                    stdout=PIPE)
-        terminal_output(o.stdout.decode())
-        top.title("邢栋的集成开发环境")
-
-    def pip_show():
-        top.title("正在获取...")
-        o = run_cmd([executable, "-m", "pip", "show"], shell=True, stdout=PIPE)
-        terminal_output(o.stdout.decode())
-        top.title("邢栋的集成开发环境")
-
-    def pip_search():
-        top.title("正在获取...")
-        o = run_cmd([executable, "-m", "pip", "search"],
-                    shell=True,
-                    stdout=PIPE)
-        terminal_output(o.stdout.decode())
-        top.title("邢栋的集成开发环境")
-
-    def pip_check():
-        top.title("正在获取...")
-        o = run_cmd([executable, "-m", "pip", "check"],
-                    shell=True,
-                    stdout=PIPE)
-        terminal_output(o.stdout.decode())
-        top.title("邢栋的集成开发环境")
-
-    def pip_download():
-        top.title(f"正在用pip下载{message.get()}")
-        run_cmd([executable, "-m", "pip", "download",
-                 message.get()],
-                shell=True)
-        messagebox.showinfo("下载完成", "下载完成")
         top.title("邢栋的集成开发环境")
 
     def python_run():
@@ -239,14 +185,12 @@ try:
         top.title(f"java运行{opened_file_path}")
 
     def pyinstaller_exe(window):
-        _ = ""
-        if window:
-            _ = "-w"
         global opened_file_path
+        base = ["pyinstaller", "-F", opened_file_path]
+        if window:
+            _ = base.insert(2, '-w')
         top.title(f"正在用pyinstaller打包{opened_file_path}")
-        o = run_cmd(["pyinstaller", "-F", _, opened_file_path],
-                    shell=True,
-                    stdout=PIPE)
+        o = run_cmd(base, shell=True, stdout=PIPE)
         terminal_output(o.stdout.decode())
         top.title("邢栋的集成开发环境")
         messagebox.showinfo("打包完成", "打包完成")
@@ -376,12 +320,6 @@ try:
         with open(opened_file_path, encoding='utf-8') as file:
             contents.delete('1.0', END)
             contents.insert(INSERT, file.read())
-
-    def requirements_install():
-        top.title("正在安装requirements.txt")
-        run_cmd([executable, "-m", "pip", "install", "-r", "requirements.txt"],
-                shell=True)
-        top.title("安装完成")
 
     def Replace():
 
@@ -647,37 +585,36 @@ try:
     menu2 = Menu(menubar, tearoff=False)
     menu2.add_command(label='更新所有第三方包',
                       command=lambda: MyThread(upgrade_all_packages))
-    menu2.add_command(label='检查依赖', command=lambda: MyThread(pip_check))
-    menu2.add_command(label='搜索', command=lambda: MyThread(pip_search))
-    menu2.add_command(label='查看信息', command=lambda: MyThread(pip_show))
+    menu2.add_command(label='检查依赖', command=lambda: pip("check"))
+    menu2.add_command(label='搜索', command=lambda: pip("search"))
+    menu2.add_command(label='查看信息', command=lambda: pip("show"))
     menu2.add_command(label='安装requirements.txt中的包',
-                      command=lambda: MyThread(requirements_install))
-    menu2.add_command(label='显示所有安装的包', command=pip_freeze)
-    menu2.add_command(label='下载安装包', command=lambda: MyThread(pip_download))
-    menu2.add_command(label='卸载', command=lambda: MyThread(pip_uninstall))
-    menu2.add_command(label='重新安装',
-                      command=lambda: MyThread(pip_reinstall))
-    menu2.add_command(label='升级', command=lambda: MyThread(pip_upgrade))
-    menu2.add_command(label='安装', command=lambda: MyThread(pip_install))
+                      command=lambda: pip("requirements_install"))
+    menu2.add_command(label='显示所有安装的包', command=lambda: pip("list"))
+    menu2.add_command(label='下载安装包', command=lambda: pip("download"))
+    menu2.add_command(label='卸载', command=lambda: pip("uninstall"))
+    menu2.add_command(label='重新安装', command=lambda: MyThread(pip_reinstall))
+    menu2.add_command(label='升级', command=lambda: pip("upgrade"))
+    menu2.add_command(label='安装', command=lambda: pip("install"))
     menubar.add_cascade(label="python第三方包管理器", menu=menu2)
     top.config(menu=menubar)
     menu3 = Menu(menubar, tearoff=False)
-    menu3.add_command(label='运行python程序', command=lambda: MyThread(python_run))
+    menu3.add_command(label='运行python程序', command=python_run)
     menu3.add_command(label='把python程序编译成命令行的exe',
-                      command=lambda: MyThread(pyinstaller_exe, False))
+                      command=lambda: pyinstaller_exe(False))
     menu3.add_command(label='把python程序编译成可视化的exe',
-                      command=lambda: MyThread(pyinstaller_exe, True))
-    menu3.add_command(label='编译c程序', command=lambda: MyThread(c_compile))
-    menu3.add_command(label='预处理c程序', command=lambda: MyThread(c_i))
-    menu3.add_command(label='编译c程序成汇编语言', command=lambda: MyThread(c_s))
-    menu3.add_command(label='编译运行c程序', command=lambda: MyThread(c_compile_run))
-    menu3.add_command(label='运行go程序', command=lambda: MyThread(go_run))
+                      command=lambda: pyinstaller_exe(True))
+    menu3.add_command(label='编译c程序', command=c_compile)
+    menu3.add_command(label='预处理c程序', command=c_i)
+    menu3.add_command(label='编译c程序成汇编语言', command=c_s)
+    menu3.add_command(label='编译运行c程序', command=c_compile_run)
+    menu3.add_command(label='运行go程序', command=go_run)
     menu3.add_command(label='把go程序编译成exe文件',
-                      command=lambda: MyThread(go_build))
-    menu3.add_command(label='编译java程序', command=lambda: MyThread(java_compile))
-    menu3.add_command(label='运行java程序', command=lambda: MyThread(java_run))
+                      command=go_build)
+    menu3.add_command(label='编译java程序', command=java_compile)
+    menu3.add_command(label='运行java程序', command=java_run)
     menu3.add_command(label='编译运行java程序',
-                      command=lambda: MyThread(java_compile_run))
+                      command=java_compile_run)
     menubar.add_cascade(label="编译与运行", menu=menu3)
     top.config(menu=menubar)
     menu4 = Menu(menubar, tearoff=False)
