@@ -136,7 +136,8 @@ try:
             base.insert(5, 'requirements.txt')
         o = run_cmd(base, shell=True, stdout=PIPE)
         terminal_output(o.stdout.decode())
-        messagebox.showinfo("运行完成", "运行完成")
+        if arg == 'install' or arg == 'upgrade' or arg == 'uninstall':
+            messagebox.showinfo("运行完成", "运行完成")
         top.title("邢栋的集成开发环境")
 
     def pip_reinstall():
