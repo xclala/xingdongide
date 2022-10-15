@@ -89,17 +89,12 @@ try:
             globals()[old] = GetWindowLong(hwnd, GWL_WNDPROC)
             SetWindowLong(hwnd, GWL_WNDPROC, globals()[new])
 
-    def load():
+    def load(files=''):
         global opened_file_path
-        opened_file_path = askopenfilename(title="打开文件")
-        with open(opened_file_path, encoding='utf-8') as file:
-            contents.delete('1.0', END)
-            contents.insert(INSERT, file.read())
-        top.title(f"打开{opened_file_path}")
-
-    def dragged_load(files):
-        global opened_file_path
-        opened_file_path = files[0].decode("gbk")
+        if files:
+            opened_file_path = files[0].decode("gbk")
+        else:
+            opened_file_path = askopenfilename(title="打开文件")
         with open(opened_file_path, encoding='utf-8') as file:
             contents.delete('1.0', END)
             contents.insert(INSERT, file.read())
@@ -291,8 +286,8 @@ try:
         top.title("python第三方包文档")
         if message.get() == '':
             port = 80
-        o = run_cmd([executable, '-m', 'pydoc', '-p',
-                     message.get()],
+        port = int(message.get())
+        o = run_cmd([executable, '-m', 'pydoc', '-p', port],
                     shell=True,
                     stdout=PIPE)
         terminal_output(o.stdout.decode())
@@ -388,7 +383,7 @@ try:
             num = len(last_line) - len(last_line.lstrip(' '))
             if (last_line.endswith(':')
                     or (':' in last_line
-                        and last_line.split(':')[-1].strip().stratswit('#'))):
+                        and last_line.split(':')[-1].strip().startswith('#'))):
                 num += 4
             elif last_line.strip().startswith(
                 ('return', 'break', 'continue', 'pass', 'raise')):
@@ -423,9 +418,9 @@ try:
                             if flag1:
                                 flag1 = False
                                 word = line[start:index]
-                                if word in bifs:
+                                if word in dir(__builtins__):
                                     contents.insert(INSERT, word, 'bif')
-                                elif word in kws:
+                                elif word in kwlist:
                                     contents.insert(INSERT, word, 'kw')
                                 else:
                                     contents.insert(INSERT, word)
@@ -442,9 +437,9 @@ try:
                 if flag1:
                     flag1 = False
                     word = line[start:]
-                    if word in bifs:
+                    if word in dir(__builtins__):
                         contents.insert(INSERT, word, 'bif')
-                    elif word in kws:
+                    elif word in kwlist:
                         contents.insert(INSERT, word, 'kw')
                     else:
                         contents.insert(INSERT, word)
@@ -532,17 +527,18 @@ try:
         open(f"https://www.baidu.com/s?wd={message.get()}&ie=utf-8")
 
     def on_key_release(event):
+        global opened_file_path
         if opened_file_path:
             save()
-        process_key(event)
+        if opened_file_path.endswith('.py') or opened_file_path.endswith(
+                '.pyw'):
+            process_key(event)
 
-    bifs = dir(__builtins__)
-    kws = kwlist
     top = Tk()
     top.title("邢栋的集成开发环境")
     top.state("zoomed")
     top.protocol("WM_DELETE_WINDOW", on_closing)
-    hook_dropfiles(top, func=dragged_load)
+    hook_dropfiles(top, func=load)
     contents = ScrolledText(font=40)
     contents.pack(side=BOTTOM, expand=True, fill=BOTH)
     contents.bind('<KeyRelease>', on_key_release)
@@ -610,12 +606,10 @@ try:
     menu3.add_command(label='编译c程序成汇编语言', command=c_s)
     menu3.add_command(label='编译运行c程序', command=c_compile_run)
     menu3.add_command(label='运行go程序', command=go_run)
-    menu3.add_command(label='把go程序编译成exe文件',
-                      command=go_build)
+    menu3.add_command(label='把go程序编译成exe文件', command=go_build)
     menu3.add_command(label='编译java程序', command=java_compile)
     menu3.add_command(label='运行java程序', command=java_run)
-    menu3.add_command(label='编译运行java程序',
-                      command=java_compile_run)
+    menu3.add_command(label='编译运行java程序', command=java_compile_run)
     menubar.add_cascade(label="编译与运行", menu=menu3)
     top.config(menu=menubar)
     menu4 = Menu(menubar, tearoff=False)
