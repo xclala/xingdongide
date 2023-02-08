@@ -89,13 +89,24 @@ try:
             globals()[old] = GetWindowLong(hwnd, GWL_WNDPROC)
             SetWindowLong(hwnd, GWL_WNDPROC, globals()[new])
 
+
+    def encoding(filepath):
+        try:
+            from chardet import detect
+            data = open(filepath, "rb").read()
+            encoding = detect(data)["encoding"]
+        except FileNotFoundError:
+            encoding = "utf-8"
+        return encoding
+
+
     def load(files=''):
         global opened_file_path
         if files:
             opened_file_path = files[0].decode("gbk")
         else:
             opened_file_path = askopenfilename(title="打开文件")
-        with open(opened_file_path, encoding='utf-8') as file:
+        with open(opened_file_path, encoding=encoding(opened_file_path)) as file:
             contents.delete('1.0', END)
             contents.insert(INSERT, file.read())
         top.title(f"打开{opened_file_path}")
@@ -107,7 +118,7 @@ try:
             resave = True
         if resave:
             opened_file_path = asksaveasfilename(title="另存为文件")
-        with open(opened_file_path, 'w', encoding='utf-8') as file:
+        with open(opened_file_path, 'w', encoding=encoding(opened_file_path)) as file:
             file.write(contents.get('1.0', END))
         top.title(f"已保存{opened_file_path}")
 

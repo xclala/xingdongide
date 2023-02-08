@@ -3,3 +3,4 @@ coverage
 yapf
 pypiwin32
 mypy
+chardet
