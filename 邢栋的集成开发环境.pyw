@@ -10,7 +10,6 @@ try:
     from threading import Thread
     from sys import executable
     from os import name as osname
-    from os.path import abspath
     from platform import python_version_tuple, python_version
 
     opened_file_path = ""
@@ -93,7 +92,8 @@ try:
     def encoding(filepath):
         try:
             from chardet import detect
-            data = open(filepath, "rb").read()
+            with open(filepath, "rb") as file_obj:
+                data = file_obj.read()
             encoding = detect(data)["encoding"]
         except FileNotFoundError:
             encoding = "utf-8"
@@ -557,7 +557,7 @@ try:
     contents.bind('<Control-S>',
                   lambda event: save(resave=True))  #Ctrl+Shift+s
     contents.bind('<Control-N>', lambda event: MyThread(
-        run_cmd, [executable, abspath(__file__)], True))  #Ctrl+Shift+n
+        run_cmd, [executable, __file__], True))  #Ctrl+Shift+n
     contents.tag_config('bif', foreground='tomato')
     contents.tag_config('kw', foreground='deepskyblue')
     contents.tag_config('comment', foreground='purple')
@@ -661,7 +661,7 @@ try:
     Button(
         text='再启动一个窗口',
         command=lambda: MyThread(
-            run_cmd, [executable, abspath(__file__)], True)).pack(side=RIGHT)
+            run_cmd, [executable, __file__], True)).pack(side=RIGHT)
     Button(text='计算器',
            command=lambda: MyThread(run_cmd, "calc", True)).pack(side=RIGHT)
     if osname == 'nt':
