@@ -678,7 +678,7 @@ try:
            command=lambda: MyThread(pythonorg)).pack(side=RIGHT)
     Button(text="显示目录文件", command=dirdir).pack(side=RIGHT)
     Button(text="替换", command=Replace).pack(side=RIGHT)
-    if python_version_tuple()[0] == '3' and int(python_version_tuple()[1]) > 5:
-        mainloop()
+    assert python_version_tuple()[0] != '3' and int(python_version_tuple()[1]) ＜ 6, “不兼容此python版本”
+    mainloop()
 except Exception as e:
     print(e)
